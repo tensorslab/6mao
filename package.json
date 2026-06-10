@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "electron-vite dev",
+    "backend": "node server/mock-backend.mjs",
     "build": "pnpm typecheck && electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",

@@ -9,7 +9,7 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ['**/*.{js,mjs,ts,tsx}'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -21,6 +21,7 @@ export default [
       },
       globals: {
         __dirname: 'readonly',
+        Buffer: 'readonly',
         process: 'readonly',
         window: 'readonly',
         document: 'readonly',
@@ -28,12 +29,12 @@ export default [
         requestAnimationFrame: 'readonly',
         clearTimeout: 'readonly',
         setTimeout: 'readonly',
+        URL: 'readonly',
         HTMLTextAreaElement: 'readonly',
         MouseEvent: 'readonly',
         HTMLElement: 'readonly',
         AbortController: 'readonly',
         TextDecoder: 'readonly',
-        URL: 'readonly'
       }
     },
     plugins: {

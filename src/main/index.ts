@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from 'electron'
 import { createPetWindow } from './windows/petWindow'
+import { openChatWindow } from './windows/chatWindow'
 import { createAppTray, destroyAppTray } from './tray'
 import { registerWindowIpc } from './ipc/window'
 
@@ -9,6 +10,8 @@ function createWindows(): void {
   petWindow = createPetWindow()
   registerWindowIpc(() => petWindow)
   createAppTray(() => petWindow)
+  petWindow.hide()
+  openChatWindow('list')
 }
 
 app.whenReady().then(() => {

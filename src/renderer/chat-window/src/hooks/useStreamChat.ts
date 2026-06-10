@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { streamChat } from '../api/chat'
 import { useChatStore } from '../store/chatHistory'
 
-export function useStreamChat(petId: string) {
+export function useStreamChat(ownerId: string, petId: string) {
   const [streaming, setStreaming] = useState(false)
   const [currentReply, setCurrentReply] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -25,7 +25,8 @@ export function useStreamChat(petId: string) {
 
     let fullReply = ''
     try {
-      for await (const chunk of streamChat(petId, trimmed, controller.signal)) {
+      for await (const chunk of streamChat(ownerId, petId, trimmed, controller.signal)) {
+        if (!chunk) continue
         fullReply += chunk
         setCurrentReply(fullReply)
       }

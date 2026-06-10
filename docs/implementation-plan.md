@@ -63,7 +63,7 @@
 - 已建立 Electron-Vite 多入口工程。
 - 已建立双窗口架构：
   - `petWindow`：透明、无边框、常驻桌面、跳过任务栏、鼠标穿透。
-  - `chatWindow`：独立聊天窗口、单例复用、可隐藏关闭。
+  - `chatWindow`：独立聊天窗口、单例复用、可隐藏关闭；应用启动时默认打开宠物列表页，避免只出现难以发现的桌宠小窗。
 - 已建立系统托盘：
   - 显示/隐藏猫咪。
   - 打开宠物列表。
@@ -97,6 +97,21 @@
   - `getPetStatus(petId)`
   - `sendChat(petId, message)`
   - `streamChat(petId, message)`
+- 已按 `docs/html/index.html` 原型里的真实后端契约完成对齐：
+  - 收养请求使用 `{ owner_id, species, name, template }`。
+  - 宠物列表解析 `{ pets: [...] }`。
+  - 宠物 ID 使用 `pet_id`。
+  - 状态解析 `bond.score`、`bond.stage`、`stats.mood`、`stats.energy`、`stats.boredom`、`soul_summary`。
+  - 流式聊天请求使用 `{ owner_id, message }`，并支持 `event:` + `data:` 格式的 SSE 事件。
+- 已配置开发代理：
+  - 前端默认使用相对 `/api` 和 `/health`。
+  - Vite dev server 将请求转发到 `VITE_DEV_API_PROXY_TARGET`，默认 `http://localhost:8000`。
+- 已增加浏览器预览 fallback：
+  - 直接打开 `http://localhost:5173/` 不再 404。
+  - 直接打开 renderer 页面时，即使没有 Electron preload，也不会因 `window.electronAPI` 缺失导致空白页。
+- 已增加开发用 mock backend：
+  - `pnpm backend` 启动 `server/mock-backend.mjs`。
+  - 当真实后端不可用时，可用于本地开发闭环。
 - 已实现状态管理：
   - TanStack Query 获取宠物列表和状态。
   - Zustand persist 保存聊天历史。
@@ -118,7 +133,14 @@ pnpm lint
 pnpm build
 ```
 
-`pnpm dev` 已做短时间启动探测：修复 Electron 入口后，命令进入长运行状态直到探测超时，没有再次出现立即启动失败。由于这是桌面窗口应用，后续还需要人工打开窗口做交互验收。
+`pnpm dev` 已做接口级启动探测：
+
+```text
+http://localhost:5173/health -> 200 {"status":"ok","version":"0.1.0"}
+http://localhost:5173/api/owner/local-owner/pets -> 200 {"owner_id":"local-owner","pets":[]}
+```
+
+当前环境中检测到真实 Python 后端正在监听 `http://localhost:8000`，Vite 代理已能正确转发到该后端。
 
 ### 已处理的问题
 
@@ -127,22 +149,21 @@ pnpm build
 - electron-vite 默认输出路径为 `out/main/index.js`，已修正 `package.json.main`。
 - 开发模式多页面入口已修正为 `src/renderer/pet-window/index.html` 和 `src/renderer/chat-window/index.html`。
 - preload 输出为 `index.mjs`，主进程窗口配置已改为加载该文件。
+- 浏览器预览没有 Electron preload，导致页面空白；已加入 `electronApiFallback`。
+- API 契约最初按计划文档做了简化，和 `docs/html/index.html` 不一致；已改为以后端原型代码为准。
 
 ## 尚未完成 / 后续事项
 
-- 需要接入真实后端并手动验收：
-  - 宠物列表。
-  - 收养流程。
-  - 宠物状态刷新。
-  - 普通聊天。
-  - SSE 流式聊天。
+- 需要在真实后端上做完整人工验收：
+  - 当前只验证了 `/health` 和宠物列表接口可达。
+  - 收养流程、状态刷新、普通聊天、SSE 流式聊天还需要使用真实数据手动走通。
 - 需要替换真实美术资产：
   - 精灵图资源。
   - Live2D 模型资源。
   - Windows `.ico` 托盘/应用图标。
 - Live2D 当前是工程入口和回退机制，缺少真实模型资源时不会展示 Live2D 模型。
 - 鼠标穿透已实现 Windows/Linux 优先路径，macOS 的无 `forward` 参数差异还需要实机专项处理。
-- `pnpm dev` 仅做了启动探测，尚未完成完整桌面交互人工验收。
+- `pnpm dev` 已做 HTTP/代理探测，但尚未完成完整桌面窗口人工验收。
 - electron-builder 已有基础配置，但还没有完成签名、图标、安装包细节和跨平台打包验证。
 
 ## 当前工程入口

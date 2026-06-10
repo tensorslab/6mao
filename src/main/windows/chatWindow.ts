@@ -51,7 +51,7 @@ export function openChatWindow(petId: string): BrowserWindow {
   })
 
   if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
-    chatWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}/src/renderer/chat-window/index.html`)
+    chatWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}/chat-window/index.html`)
   } else {
     chatWindow.loadFile(join(__dirname, '../renderer/chat-window/index.html'))
   }

@@ -10,6 +10,7 @@ export function registerWindowIpc(getPetWindow: () => BrowserWindow | null): voi
   registered = true
 
   ipcMain.on(IPC_CHANNELS.WINDOW_OPEN_CHAT, (_event, payload: OpenChatPayload) => {
+    getPetWindow()?.hide()
     openChatWindow(payload.petId)
   })
 

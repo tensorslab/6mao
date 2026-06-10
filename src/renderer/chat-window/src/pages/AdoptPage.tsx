@@ -4,9 +4,13 @@ import { adoptPet } from '../api/adopt'
 import type { Pet } from '../api/types'
 
 const templates = [
-  { id: 'genki', label: '元气猫', description: '每天像一颗会喵的橘子汽水。' },
-  { id: 'sleepy', label: '困困猫', description: '擅长陪你一起慢下来。' },
-  { id: 'cool', label: '酷酷猫', description: '话少，但会默默守在桌角。' }
+  { id: 'cat-default', label: 'Balanced', description: '均衡、稳定，适合第一只桌面猫咪。' },
+  { id: 'cat-tsundere', label: 'Tsundere', description: '嘴硬但会偷偷陪着你。' },
+  { id: 'cat-clingy', label: 'Clingy', description: '黏人，随时准备贴贴。' },
+  { id: 'cat-social', label: 'Social', description: '外向，喜欢热闹和互动。' },
+  { id: 'cat-philosopher', label: 'Philosopher', description: '会把纸箱思考成宇宙。' },
+  { id: 'cat-mischief', label: 'Mischievous', description: '淘气，可能会把事情变有趣。' },
+  { id: 'cat-lazy', label: 'Lazy', description: '懒洋洋，但很会陪伴。' }
 ]
 
 export function AdoptPage({
@@ -21,7 +25,7 @@ export function AdoptPage({
   const [templateId, setTemplateId] = useState(templates[0].id)
 
   const mutation = useMutation({
-    mutationFn: () => adoptPet({ ownerId, petTemplateId: templateId, name }),
+    mutationFn: () => adoptPet({ owner_id: ownerId, species: 'cat', template: templateId, name }),
     onSuccess: (pet) => {
       queryClient.invalidateQueries({ queryKey: ['owner-pets', ownerId] })
       onAdopted(pet)

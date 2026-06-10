@@ -1,24 +1,42 @@
-export type Personality = 'tsundere' | 'genki' | 'sleepy' | 'cool' | 'gentle'
+export type Personality = 'tsundere' | 'genki' | 'sleepy' | 'cool' | 'gentle' | string
 
 export interface Pet {
-  id: string
+  pet_id: string
   name: string
-  personality: Personality
-  adoptedAt: string
-  ownerId: string
+  species?: string
+  template?: string
+  personality?: Personality
+  bond_stage?: string
+  created_at?: string
+  adopted_at?: string
+  owner_id?: string
+}
+
+export interface OwnerPetsResponse {
+  pets: Pet[]
+}
+
+export interface AdoptResponse {
+  pet_id?: string
+  pet?: Pet
+  name?: string
+  greeting?: string
 }
 
 export interface PetStatus {
-  bond: number
-  stats: {
-    hunger: number
-    happiness: number
-    energy: number
-    cleanliness: number
+  name: string
+  bond?: {
+    score?: number
+    stage?: string
   }
-  soul: {
-    mood: string
-    trait: string
+  stats: {
+    mood?: number
+    energy?: number
+    boredom?: number
+  }
+  soul_summary?: {
+    personality_tags?: string[]
+    tone?: string
   }
 }
 
@@ -29,12 +47,14 @@ export interface ChatMessage {
 }
 
 export interface AdoptRequest {
-  ownerId: string
-  petTemplateId: string
+  owner_id: string
+  species: 'cat'
+  template: string
   name: string
 }
 
 export interface ChatRequest {
+  owner_id: string
   message: string
 }
 

@@ -5,19 +5,23 @@ import { useChatStore } from '../store/chatHistory'
 import { useStreamChat } from '../hooks/useStreamChat'
 import { StatusPanel } from '../components/StatusPanel'
 
+const EMPTY_MESSAGES: ChatMessage[] = []
+
 export function ChatPage({
   petId,
+  ownerId,
   status,
   statusLoading
 }: {
   petId: string
+  ownerId: string
   status?: PetStatus
   statusLoading: boolean
 }) {
   const [input, setInput] = useState('')
-  const history = useChatStore((state) => state.histories[petId] ?? [])
+  const history = useChatStore((state) => state.histories[petId] ?? EMPTY_MESSAGES)
   const clearHistory = useChatStore((state) => state.clearHistory)
-  const { sendMessage, streaming, currentReply, error } = useStreamChat(petId)
+  const { sendMessage, streaming, currentReply, error } = useStreamChat(ownerId, petId)
 
   const messages: ChatMessage[] = currentReply
     ? [...history, { role: 'assistant', content: currentReply, timestamp: 0 }]
@@ -81,9 +85,12 @@ export function ChatPage({
           </p>
         ) : null}
 
-        <form className="flex gap-2 border-t border-[#2c2118]/10 p-3" onSubmit={handleSubmit}>
+        <form
+          className="no-drag relative z-20 flex gap-2 border-t border-[#2c2118]/10 p-3"
+          onSubmit={handleSubmit}
+        >
           <textarea
-            className="min-h-11 flex-1 resize-none rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm font-semibold outline-none ring-[#f4b860] transition focus:ring-4"
+            className="no-drag min-h-11 flex-1 resize-none rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm font-semibold outline-none ring-[#f4b860] transition focus:ring-4"
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
@@ -95,7 +102,7 @@ export function ChatPage({
             placeholder="输入消息，Enter 发送"
           />
           <button
-            className="grid h-11 w-11 place-items-center rounded-2xl bg-[#f07f61] text-white shadow-lg transition hover:scale-105 disabled:opacity-50"
+            className="no-drag grid h-11 w-11 place-items-center rounded-2xl bg-[#f07f61] text-white shadow-lg transition hover:scale-105 disabled:opacity-50"
             disabled={streaming || !input.trim()}
             aria-label="发送"
           >

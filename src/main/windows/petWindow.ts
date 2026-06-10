@@ -28,14 +28,15 @@ export function createPetWindow(): BrowserWindow {
 
   petWindow.setAlwaysOnTop(true, 'floating')
   petWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-  petWindow.setIgnoreMouseEvents(true, { forward: true })
+  // Keep first launch clickable; renderer toggles pass-through after pointer movement.
+  petWindow.setIgnoreMouseEvents(false)
 
   petWindow.once('ready-to-show', () => {
     petWindow.showInactive()
   })
 
   if (!app.isPackaged && process.env.ELECTRON_RENDERER_URL) {
-    petWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}/src/renderer/pet-window/index.html`)
+    petWindow.loadURL(`${process.env.ELECTRON_RENDERER_URL}/pet-window/index.html`)
   } else {
     petWindow.loadFile(join(__dirname, '../renderer/pet-window/index.html'))
   }
