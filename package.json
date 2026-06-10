@@ -74,12 +74,5 @@
     "linux": {
       "target": "AppImage"
     }
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "electron",
-      "electron-winstaller",
-      "esbuild"
-    ]
   }
 }

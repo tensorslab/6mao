@@ -1,19 +1,35 @@
 @import 'tailwindcss';
 
 :root {
-  color: #2c2118;
+  color: #4F3E30;
   background: transparent;
   font-family:
     'Nunito', 'Baloo 2', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  --cream: #fff7e8;
-  --ink: #2c2118;
-  --honey: #f4b860;
-  --coral: #f07f61;
-  --mint: #7abf9e;
-  --night: #192133;
+
+  /* ── 半山喵事处 · Character Style Guide 色板 ── */
+  --washi-50:  #FCF6E7;   /* 底纸 */
+  --washi-100: #F8EED4;   /* 纸面阴影 */
+  --kaki-500:  #D67A3E;   /* 柿橙（主点缀色） */
+  --kaki-700:  #8B431A;   /* 柿橙深（强调） */
+  --sakura-500: #E8A4A4;  /* 樱粉（情感） */
+  --pine-500:  #7A8B6B;   /* 松绿（自然/安定） */
+  --mist-500:  #A8B8C5;   /* 霧蓝（理性/检索） */
+  --ink-700:   #4F3E30;   /* 墨褐（线稿/文字） */
+  --wood-500:  #8B6F47;   /* 原木（道具） */
+
+  /* ── 语义化别名 ── */
+  --bg:        var(--washi-50);
+  --bg-shadow: var(--washi-100);
+  --fg:        var(--ink-700);
+  --accent:    var(--kaki-500);
+  --accent-deep: var(--kaki-700);
+  --emotion:   var(--sakura-500);
+  --nature:    var(--pine-500);
+  --reason:    var(--mist-500);
+  --prop:      var(--wood-500);
 }
 
 * {
@@ -40,4 +56,17 @@ textarea {
 
 .no-drag {
   -webkit-app-region: no-drag;
+}
+
+/* ── 半山喵事处 · 水彩纸纹背景 ── */
+.bg-miao {
+  background:
+    radial-gradient(circle at top left, var(--washi-100), transparent 35%),
+    linear-gradient(145deg, var(--washi-50), #f5dcc6 52%, #c3d9c8);
+}
+
+/* ── 角色头像圆形 ── */
+.ph-cat {
+  border-radius: 50%;
+  object-fit: cover;
 }

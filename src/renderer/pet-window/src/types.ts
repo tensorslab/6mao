@@ -1,16 +1,33 @@
 import type { PetEmotion, PetRenderMode } from '../../../shared/ipc-channels'
 
-export type Personality = 'tsundere' | 'genki' | 'sleepy' | 'cool' | 'gentle'
+/** 六角色 ID — 与 character-style-guide.md 对应 */
+export type CharacterId = 'scholar' | 'tea' | 'mechanic' | 'messenger' | 'student' | 'artist'
 
-export interface PetPersonalityConfig {
-  id: Personality
+/** 向后兼容的 Personality 别名 */
+export type Personality = CharacterId
+
+export interface CharacterConfig {
+  id: CharacterId
   displayName: string
-  modelPath: string
-  spritePath: string
-  idleMotion: string
-  talkMotion: string
-  idleInterval: number
+  title: string
+  /** 主点缀色 (CSS var name) */
+  colorVar: string
+  /** 主点缀色 hex */
   color: string
+  /** 道具/配饰描述 */
+  prop: string
+  /** 对应的大师能力 */
+  masterSkill: string
+  /** Live2D 模型路径 */
+  modelPath: string
+  /** 精灵图路径（备用） */
+  spritePath: string
+  /** 空闲动画名 */
+  idleMotion: string
+  /** 说话动画名 */
+  talkMotion: string
+  /** 随机动作触发间隔 ms */
+  idleInterval: number
 }
 
 export interface RenderPet {

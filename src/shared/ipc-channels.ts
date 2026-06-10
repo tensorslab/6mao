@@ -1,15 +1,46 @@
 export const IPC_CHANNELS = {
+  // ── 窗口控制 ──
   WINDOW_OPEN_CHAT: 'window:open-chat',
   WINDOW_CLOSE_CHAT: 'window:close-chat',
   WINDOW_SET_IGNORE_MOUSE: 'window:set-ignore-mouse',
+
+  // ── 宠物数据 ──
   PET_SWITCH: 'pet:switch',
   PET_CURRENT: 'pet:current',
   PET_STATUS_UPDATE: 'pet:status-update',
-  PET_EMOTION: 'pet:emotion'
+  PET_EMOTION: 'pet:emotion',
+
+  // ── Daemon 管理 ──
+  DAEMON_STATUS: 'daemon:status',
+  DAEMON_PORT: 'daemon:port',
+
+  // ── 大师调用 ──
+  MASTER_START: 'master:start',
+  MASTER_DONE: 'master:done',
+  MASTER_ARTIFACT: 'master:artifact',
+
+  // ── 主动行为（Daemon → 宠物） ──
+  PET_PROACTIVE: 'pet:proactive',
+
+  // ── 偏好设置 ──
+  PREFERENCES_UPDATE: 'preferences:update'
 } as const
 
-export type PetEmotion = 'idle' | 'talk' | 'happy' | 'sad' | 'surprised'
+export type PetEmotion =
+  | 'idle'
+  | 'talk'
+  | 'happy'
+  | 'sad'
+  | 'surprised'
+  | 'thinking'
+  | 'painting'
+  | 'celebrate'
+  | 'sleep'
+  | 'paw_wave'
+
 export type PetRenderMode = 'sprite' | 'live2d'
+
+export type DaemonStatus = 'starting' | 'running' | 'stopped' | 'error'
 
 export interface OpenChatPayload {
   petId: string
@@ -27,4 +58,35 @@ export interface PetCurrentPayload {
 
 export interface PetEmotionPayload {
   emotion: PetEmotion
+}
+
+export interface DaemonStatusPayload {
+  status: DaemonStatus
+  port?: number
+}
+
+export interface MasterStartPayload {
+  masterType: string
+  taskId: string
+}
+
+export interface MasterDonePayload {
+  taskId: string
+  summary?: string
+}
+
+export interface MasterArtifactPayload {
+  taskId: string
+  type: 'image' | 'code' | 'text' | 'search'
+  data: string
+}
+
+export interface PetProactivePayload {
+  action: string
+  text?: string
+}
+
+export interface PreferencesUpdatePayload {
+  key: string
+  value: unknown
 }
