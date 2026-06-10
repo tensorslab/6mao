@@ -1,0 +1,20 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "types": ["vite/client", "react", "react-dom"],
+    "paths": {
+      "@shared/*": ["src/shared/*"],
+      "@chat/*": ["src/renderer/chat-window/src/*"],
+      "@pet/*": ["src/renderer/pet-window/src/*"]
+    }
+  },
+  "include": [
+    "src/renderer/**/*",
+    "src/shared/**/*",
+    "src/preload/renderer.d.ts"
+  ]
+}
