@@ -16,7 +16,11 @@ export function installElectronApiFallback(): void {
     notifyPetEmotion: (emotion) => {
       console.info('[6mao preview] pet emotion', emotion)
     },
+    setCurrentPet: (pet) => {
+      console.info('[6mao preview] current pet', pet)
+    },
     onPetSwitch: () => noopUnsubscribe,
+    onCurrentPet: () => noopUnsubscribe,
     onPetEmotion: () => noopUnsubscribe
   } satisfies ElectronAPI
 }

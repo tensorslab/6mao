@@ -20,7 +20,7 @@ export function CatLive2D({ pet, emotion, onClick }: PetRendererProps) {
           import('pixi-live2d-display')
         ])
         const app = new Application()
-        await app.init({ backgroundAlpha: 0, width: 190, height: 190, antialias: true })
+        await app.init({ backgroundAlpha: 0, width: 132, height: 76, antialias: true })
         if (disposed) {
           app.destroy()
           return
@@ -33,9 +33,9 @@ export function CatLive2D({ pet, emotion, onClick }: PetRendererProps) {
           return
         }
 
-        model.scale.set(0.12)
-        model.x = 95
-        model.y = 20
+        model.scale.set(0.08)
+        model.x = 66
+        model.y = 8
         app.stage.addChild(model as never)
         setStatus('Live2D ready')
 
@@ -58,7 +58,7 @@ export function CatLive2D({ pet, emotion, onClick }: PetRendererProps) {
   return (
     <button
       id="cat-sprite"
-      className="no-drag group relative h-[190px] w-[190px] cursor-pointer overflow-hidden rounded-[44px] border-0 bg-transparent p-0"
+      className="no-drag group relative grid h-[76px] w-[132px] cursor-pointer place-items-center overflow-hidden rounded-[28px] border-0 bg-transparent p-0"
       onClick={onClick}
       aria-label={`和 ${pet.name} 聊天`}
       title={`和 ${pet.name} 聊天`}
@@ -67,17 +67,17 @@ export function CatLive2D({ pet, emotion, onClick }: PetRendererProps) {
       {status !== 'Live2D ready' ? (
         <div className="absolute inset-0 flex items-center justify-center">
           <img
-            className="h-full w-full drop-shadow-2xl"
+            className="pointer-events-none absolute bottom-0 h-16 w-16 translate-y-5 opacity-60 drop-shadow-xl"
             src={PERSONALITY_CONFIGS[pet.personality].spritePath}
             alt={pet.name}
             draggable={false}
           />
-          <span className="absolute bottom-5 rounded-full bg-white/80 px-3 py-1 text-xs font-bold text-[#2c2118] shadow">
+          <span className="pointer-events-none absolute bottom-1 rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-bold text-[#2c2118] shadow">
             {status}
           </span>
         </div>
       ) : null}
-      <span className="absolute left-1/2 top-2 z-10 -translate-x-1/2 rounded-full border border-white/70 bg-white/80 px-3 py-1 text-xs font-bold text-[#2c2118] shadow-lg backdrop-blur">
+      <span className="pointer-events-none relative z-10 max-w-[120px] truncate rounded-full border border-white/70 bg-white/95 px-4 py-2 text-sm font-black text-[#2c2118] shadow-lg backdrop-blur">
         {emotion === 'talk' ? '喵喵输入中' : pet.name}
       </span>
     </button>

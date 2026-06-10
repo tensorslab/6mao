@@ -17,10 +17,20 @@ const fallbackStatus: PetStatus = {
   }
 }
 
-const statLabels: Record<keyof PetStatus['stats'], string> = {
+type VisibleStatKey = 'mood' | 'energy' | 'boredom'
+
+const statLabels: Record<VisibleStatKey, string> = {
   mood: '心情',
   energy: '精力',
   boredom: '无聊'
+}
+
+const visibleStatKeys: VisibleStatKey[] = ['mood', 'energy', 'boredom']
+
+function toPercent(value: unknown): number {
+  const numericValue = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(numericValue)) return 0
+  return Math.max(0, Math.min(100, Math.round(numericValue * 100)))
 }
 
 export function StatusPanel({
@@ -32,7 +42,7 @@ export function StatusPanel({
 }) {
   const view = status ?? fallbackStatus
   const stats = view.stats ?? fallbackStatus.stats
-  const bondPercent = Math.round((view.bond?.score ?? 0) * 100)
+  const bondPercent = toPercent(view.bond?.score)
 
   return (
     <section className="rounded-[28px] border border-white/60 bg-white/70 p-4 shadow-xl shadow-[#2c2118]/10 backdrop-blur">
@@ -48,26 +58,23 @@ export function StatusPanel({
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        {(Object.keys(stats) as Array<keyof PetStatus['stats']>).map((key) => (
-          <div key={key} className="rounded-2xl bg-[#fff7e8] p-3">
-            <div className="flex justify-between text-xs font-bold text-[#2c2118]/70">
-              <span>{statLabels[key]}</span>
-              <span>{Math.round((stats[key] ?? 0) * 100)}%</span>
+        {visibleStatKeys.map((key) => {
+          const percent = toPercent(stats[key])
+
+          return (
+            <div key={key} className="rounded-2xl bg-[#fff7e8] p-3">
+              <div className="flex justify-between text-xs font-bold text-[#2c2118]/70">
+                <span>{statLabels[key]}</span>
+                <span>{percent}%</span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
+                <div className="h-full rounded-full bg-[#f07f61]" style={{ width: `${percent}%` }} />
+              </div>
             </div>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
-              <div
-                className="h-full rounded-full bg-[#f07f61]"
-                style={{ width: `${Math.max(0, Math.min(100, (stats[key] ?? 0) * 100))}%` }}
-              />
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
-      <p className="mt-4 rounded-2xl bg-[#192133] px-4 py-3 text-sm font-semibold leading-relaxed text-white">
-        {(view.soul_summary?.personality_tags ?? []).join(' / ') || '猫咪档案'}：
-        {view.soul_summary?.tone || '等待后端返回灵魂状态。'}
-      </p>
     </section>
   )
 }

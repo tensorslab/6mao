@@ -33,6 +33,7 @@ export interface PetStatus {
     mood?: number
     energy?: number
     boredom?: number
+    updated_at?: string
   }
   soul_summary?: {
     personality_tags?: string[]

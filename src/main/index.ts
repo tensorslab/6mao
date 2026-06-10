@@ -10,7 +10,6 @@ function createWindows(): void {
   petWindow = createPetWindow()
   registerWindowIpc(() => petWindow)
   createAppTray(() => petWindow)
-  petWindow.hide()
   openChatWindow('list')
 }
 

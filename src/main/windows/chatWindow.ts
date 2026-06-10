@@ -19,10 +19,10 @@ export function openChatWindow(petId: string): BrowserWindow {
   }
 
   chatWindow = new BrowserWindow({
-    width: 420,
-    height: 680,
-    minWidth: 360,
-    minHeight: 560,
+    width: 560,
+    height: 780,
+    minWidth: 460,
+    minHeight: 640,
     frame: false,
     titleBarStyle: 'hidden',
     vibrancy: 'under-window',

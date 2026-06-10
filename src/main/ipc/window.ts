@@ -1,5 +1,10 @@
 import { BrowserWindow, ipcMain } from 'electron'
-import { IPC_CHANNELS, OpenChatPayload, PetEmotionPayload } from '../../shared/ipc-channels'
+import {
+  IPC_CHANNELS,
+  OpenChatPayload,
+  PetCurrentPayload,
+  PetEmotionPayload
+} from '../../shared/ipc-channels'
 import { closeChatWindow, getChatWindow, openChatWindow } from '../windows/chatWindow'
 
 let registered = false
@@ -10,7 +15,6 @@ export function registerWindowIpc(getPetWindow: () => BrowserWindow | null): voi
   registered = true
 
   ipcMain.on(IPC_CHANNELS.WINDOW_OPEN_CHAT, (_event, payload: OpenChatPayload) => {
-    getPetWindow()?.hide()
     openChatWindow(payload.petId)
   })
 
@@ -32,6 +36,12 @@ export function registerWindowIpc(getPetWindow: () => BrowserWindow | null): voi
     const petWindow = getPetWindow()
     if (!petWindow || petWindow.isDestroyed()) return
     petWindow.webContents.send(IPC_CHANNELS.PET_EMOTION, payload)
+  })
+
+  ipcMain.on(IPC_CHANNELS.PET_CURRENT, (_event, payload: PetCurrentPayload) => {
+    const petWindow = getPetWindow()
+    if (!petWindow || petWindow.isDestroyed()) return
+    petWindow.webContents.send(IPC_CHANNELS.PET_CURRENT, payload)
   })
 
   ipcMain.on(IPC_CHANNELS.PET_STATUS_UPDATE, (_event, payload) => {

@@ -3,8 +3,8 @@ import { join } from 'node:path'
 
 export function createPetWindow(): BrowserWindow {
   const { workArea } = screen.getPrimaryDisplay()
-  const width = 220
-  const height = 220
+  const width = 150
+  const height = 92
 
   const petWindow = new BrowserWindow({
     width,
@@ -28,8 +28,7 @@ export function createPetWindow(): BrowserWindow {
 
   petWindow.setAlwaysOnTop(true, 'floating')
   petWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
-  // Keep first launch clickable; renderer toggles pass-through after pointer movement.
-  petWindow.setIgnoreMouseEvents(false)
+  petWindow.setIgnoreMouseEvents(true, { forward: true })
 
   petWindow.once('ready-to-show', () => {
     petWindow.showInactive()

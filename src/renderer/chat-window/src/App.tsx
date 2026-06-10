@@ -54,6 +54,11 @@ export function App() {
     })
   }, [setCurrentPetId])
 
+  useEffect(() => {
+    if (!activePet) return
+    window.electronAPI.setCurrentPet({ petId: activePet.pet_id, name: activePet.name })
+  }, [activePet])
+
   const selectPet = (petId: string): void => {
     setCurrentPetId(petId)
     setView('chat')

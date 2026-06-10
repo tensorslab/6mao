@@ -28,6 +28,16 @@ export function App() {
   }, [])
 
   useEffect(() => {
+    return window.electronAPI.onCurrentPet((currentPet) => {
+      setPet((existing) => ({
+        ...existing,
+        id: currentPet.petId,
+        name: currentPet.name
+      }))
+    })
+  }, [])
+
+  useEffect(() => {
     let frame = 0
 
     const handleMouseMove = (event: MouseEvent) => {

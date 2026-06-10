@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import { Send, Trash2 } from 'lucide-react'
 import type { ChatMessage, PetStatus } from '../api/types'
 import { useChatStore } from '../store/chatHistory'
@@ -19,6 +19,7 @@ export function ChatPage({
   statusLoading: boolean
 }) {
   const [input, setInput] = useState('')
+  const scrollRef = useRef<HTMLDivElement | null>(null)
   const history = useChatStore((state) => state.histories[petId] ?? EMPTY_MESSAGES)
   const clearHistory = useChatStore((state) => state.clearHistory)
   const { sendMessage, streaming, currentReply, error } = useStreamChat(ownerId, petId)
@@ -26,6 +27,12 @@ export function ChatPage({
   const messages: ChatMessage[] = currentReply
     ? [...history, { role: 'assistant', content: currentReply, timestamp: 0 }]
     : history
+
+  useEffect(() => {
+    const scroller = scrollRef.current
+    if (!scroller) return
+    scroller.scrollTo({ top: scroller.scrollHeight, behavior: 'smooth' })
+  }, [messages.length, currentReply, streaming])
 
   const handleSubmit = (event: FormEvent): void => {
     event.preventDefault()
@@ -53,7 +60,7 @@ export function ChatPage({
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+        <div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
           {messages.length === 0 ? (
             <div className="rounded-3xl bg-[#fff7e8] p-4 text-sm font-semibold text-[#2c2118]/65">
               先说点什么吧。猫咪正在假装没等你。
@@ -90,7 +97,7 @@ export function ChatPage({
           onSubmit={handleSubmit}
         >
           <textarea
-            className="no-drag min-h-11 flex-1 resize-none rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm font-semibold outline-none ring-[#f4b860] transition focus:ring-4"
+            className="no-drag min-h-24 flex-1 resize-y rounded-2xl border border-white/70 bg-white/85 px-4 py-3 text-sm font-semibold leading-relaxed outline-none ring-[#f4b860] transition focus:ring-4"
             value={input}
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={(event) => {
