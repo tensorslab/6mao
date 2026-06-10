@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 MiaoAgent Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+    <style>
+        :root {
+            --primary: #FF9A8B;
+            --primary-light: #FFC3A0;
+            --bg: #FFF5F0;
+            --text-dark: #4A4A4A;
+            --text-light: #888;
+            --bot-bg: #FFFFFF;
+            --user-bg: #FF9A8B;
+            --user-text: #FFFFFF;
+            --shadow: 0 4px 12px rgba(255, 154, 139, 0.15);
+            --border-radius: 20px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: linear-gradient(135deg, var(--bg) 0%, #ffe6d9 100%);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: row;
+        }
+
+        /* Layout */
+        .sidebar {
+            width: 340px;
+            flex-shrink: 0;
+            overflow-y: auto;
+            height: 100vh;
+            background: white;
+            border-right: 1px solid rgba(255,154,139,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            flex: 1;
+            min-width: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .section-header {
+            text-transform: uppercase;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 12px 16px 4px;
+            font-weight: 600;
+        }
+
+        .panel {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,154,139,0.2);
+        }
+        
+        .panel:last-child {
+            border-bottom: none;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sidebar-input, .sidebar-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+        .sidebar-input:focus, .sidebar-select:focus {
+            border-color: var(--primary);
+        }
+
+        .primary-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .primary-btn:hover:not(:disabled) {
+            background: #ff8573;
+        }
+        .primary-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .danger-btn {
+            background: #FF5252;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .danger-btn:hover:not(:disabled) {
+            background: #ff3333;
+        }
+        .danger-btn:disabled {
+            background: #ffbaba;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .secondary-btn:hover:not(:disabled) {
+            background: rgba(255,154,139,0.1);
+        }
+        
+        .panel-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-right: 16px;
+        }
+
+        /* Pet List */
+        .pet-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        
+        .pet-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .pet-row:hover {
+            background: rgba(0,0,0,0.02);
+        }
+        .pet-row.selected {
+            background: rgba(255,154,139,0.12);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .pet-row-icon {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+        .pet-row-name {
+            flex: 1;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .pill-badge {
+            background: rgba(255,154,139,0.15);
+            color: var(--primary);
+            font-size: 0.75rem;
+            border-radius: 20px;
+            padding: 2px 8px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        /* Progress Bars */
+        .stat-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        .stat-label {
+            width: 80px;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+        .progress-track {
+            flex: 1;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        #bar-boredom { background: #F5A623; } /* Amber for boredom */
+        
+        .stat-value {
+            width: 35px;
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .tone-text {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        /* Action Buttons */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .action-btn[data-action="play"] { border-bottom: 3px solid #4CAF50; }
+        .action-btn[data-action="learn"] { border-bottom: 3px solid #2196F3; }
+        .action-btn[data-action="work"] { border-bottom: 3px solid #9C27B0; }
+        .action-btn[data-action="pet"] { border-bottom: 3px solid #FF9800; }
+
+        /* Result Areas */
+        .error-text {
+            color: #d32f2f;
+            font-size: 0.85rem;
+            margin-top: 4px;
+            display: none;
+        }
+        .error-text.active {
+            display: block;
+        }
+
+        /* Chat Area (adapted) */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .header-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: normal;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ccc;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+
+        .status-dot.online { background-color: #4CAF50; box-shadow: 0 0 5px #4CAF50; }
+        .status-dot.offline { background-color: #F44336; box-shadow: 0 0 5px #F44336; }
+
+        .chat-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .clear-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .clear-btn:hover { background: rgba(255,255,255,0.3); }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #fcfcfc;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-light);
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            opacity: 0.7;
+        }
+        .empty-state span { font-size: 3rem; }
+
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .message-wrapper.user { align-self: flex-end; align-items: flex-end; }
+        .message-wrapper.bot { align-self: flex-start; align-items: flex-start; }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            position: relative;
+            word-break: break-word;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, var(--user-bg) 0%, var(--primary-light) 100%);
+            color: var(--user-text);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot {
+            background: var(--bot-bg);
+            border: 1px solid #eee;
+            color: var(--text-dark);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            width: 100%;
+        }
+        
+        .message.error {
+            background: #fff0f0;
+            border: 1px solid #ffcdd2;
+            color: #d32f2f;
+        }
+
+        .timestamp {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+        .message-wrapper.user .timestamp { color: rgba(255,255,255,0.8); }
+
+        /* Markdown Styles */
+        .markdown-content { line-height: 1.5; }
+        .markdown-content p { margin-bottom: 8px; }
+        .markdown-content p:last-child { margin-bottom: 0; }
+        .markdown-content pre { 
+            background: #2b2b2b; 
+            color: #f8f8f2; 
+            padding: 10px; 
+            border-radius: 8px; 
+            overflow-x: auto; 
+            margin: 8px 0; 
+        }
+        .markdown-content code { 
+            background: rgba(0,0,0,0.05); 
+            padding: 2px 4px; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            font-size: 0.9em; 
+        }
+        .markdown-content pre code { 
+            background: transparent; 
+            padding: 0; 
+            color: inherit; 
+        }
+        .markdown-content ul, .markdown-content ol { 
+            margin-left: 20px; 
+            margin-bottom: 8px; 
+        }
+        .markdown-content li { margin-bottom: 4px; }
+
+        /* Tool and Thinking Styles */
+        .tools-container { margin-bottom: 8px; }
+        .tools-container:empty { display: none; }
+        .thinking-block {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            overflow: hidden;
+        }
+        .thinking-block summary {
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #666;
+            font-weight: 500;
+            user-select: none;
+            outline: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .thinking-block summary:hover { background: #f0f0f0; }
+        .thinking-content {
+            padding: 8px 12px;
+            color: #777;
+            border-top: 1px solid #eee;
+            background: #fcfcfc;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-style: italic;
+        }
+        .think-text { font-size: 0.85rem; line-height: 1.4; padding: 4px; }
+        .think-text p { margin-bottom: 6px; }
+        .think-text p:last-child { margin-bottom: 0; }
+        .tool-block {
+            background: #f0f4f8;
+            border-left: 3px solid #6c9bcf;
+            padding: 6px 10px;
+            font-size: 0.85rem;
+            color: #4a5568;
+            border-radius: 0 4px 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Artifact Card & Thinking Indicator */
+        .artifact-card {
+            background: linear-gradient(135deg, #fff8f6 0%, #fff 100%);
+            border: 1.5px solid var(--primary-light);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(255, 154, 139, 0.12);
+            position: relative;
+            overflow: hidden;
+        }
+        .artifact-card::before {
+            content: '⚡ 大师技能';
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255,154,139,0.2);
+            padding-bottom: 6px;
+        }
+        .thinking-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--primary);
+            font-style: italic;
+            padding: 8px 12px;
+            background: rgba(255, 154, 139, 0.1);
+            border-radius: 8px;
+            margin-top: 8px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .worker-progress {
+            border: 1px solid rgba(255, 154, 139, 0.25);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 8px;
+            background: #fff9f8;
+            font-size: 0.85rem;
+        }
+        .worker-header {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 0.88rem;
+        }
+        .worker-header .step-spinner {
+            width: 11px;
+            height: 11px;
+            flex-shrink: 0;
+        }
+        .worker-header.done .step-spinner { display: none; }
+        .worker-progress-bar-wrap {
+            height: 4px;
+            background: rgba(255, 154, 139, 0.2);
+            border-radius: 2px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .worker-progress-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        .worker-step-list {
+            transition: opacity 0.3s;
+        }
+        .worker-step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 0;
+            color: #666;
+        }
+        .worker-step.done { color: var(--primary); font-weight: 500; font-style: normal; opacity: 0.9; }
+        .worker-step.running { color: #666; font-style: italic; }
+        @keyframes step-spin { 100% { transform: rotate(360deg); } }
+        .step-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 154, 139, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: step-spin 0.8s linear infinite;
+        }
+        
+        .worker-progress-summary {
+            font-size: 0.85rem;
+            color: #333;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 0;
+            font-weight: 500;
+        }
+
+        .input-area {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .msg-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #eee;
+            border-radius: 20px;
+            outline: none;
+            font-size: 0.95rem;
+            background: #fafafa;
+            transition: all 0.2s;
+        }
+        .msg-input:focus {
+            background: white;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(255, 154, 139, 0.1);
+        }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s, background 0.2s;
+            box-shadow: 0 2px 8px rgba(255, 154, 139, 0.4);
+        }
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            background: #ff8573;
+        }
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .typing-indicator { display: flex; gap: 4px; padding: 4px 8px; }
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #aaa;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            body { flex-direction: column; height: auto; min-height: 100vh; }
+            .sidebar { width: 100%; height: auto; flex-shrink: 0; border-right: none; border-bottom: 1px solid rgba(255,154,139,0.2); }
+            .chat-container { height: 600px; flex: none; }
+        }
+        @media (max-width: 500px) {
+            .chat-container { border-radius: 0; border: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Owner Panel -->
+        <div class="section-header">Owner</div>
+        <div class="panel">
+            <input type="text" id="owner-id" class="sidebar-input" placeholder="Owner ID (e.g. owner-123)">
+        </div>
+
+        <!-- Adopt Panel -->
+        <div class="section-header">Adopt a Pet</div>
+        <div class="panel">
+            <div class="input-group">
+                <div class="input-row">
+                    <input type="text" id="adopt-name" class="sidebar-input" placeholder="Pet Name" style="width: 100%;">
+                </div>
+                <select id="adopt-template" class="sidebar-select">
+                    <option value="cat-default">Balanced</option>
+                    <option value="cat-tsundere">Tsundere</option>
+                    <option value="cat-clingy">Clingy</option>
+                    <option value="cat-social">Social</option>
+                    <option value="cat-philosopher">Philosopher</option>
+                    <option value="cat-mischief">Mischievous</option>
+                    <option value="cat-lazy">Lazy</option>
+                </select>
+                <button id="adopt-btn" class="primary-btn">Adopt 🐾</button>
+            </div>
+            <div id="adopt-result" class="result-card"></div>
+            <div id="adopt-error" class="error-text"></div>
+        </div>
+
+        <!-- My Pets -->
+        <div class="panel-header-row">
+            <div class="section-header">My Pets</div>
+            <button id="refresh-pets-btn" class="secondary-btn">Refresh 🔄</button>
+        </div>
+        <div class="panel" style="padding-top: 0;">
+            <div id="pets-error" class="error-text"></div>
+            <div id="pet-list" class="pet-list">
+                <!-- Pet rows injected here -->
+                <div style="font-size: 0.85rem; color: #888; text-align: center; padding: 10px;">Enter Owner ID to see pets</div>
+            </div>
+        </div>
+
+        <!-- Pet Status -->
+        <div id="status-panel-container" style="display: none;">
+            <div class="section-header">Pet Status</div>
+            <div class="panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-weight: 600; font-size: 1.1rem;" id="status-name">Name</div>
+                    <span class="pill-badge" id="status-stage">Stage</span>
+                </div>
+                
+                <div class="stat-row" title="Bond Score">
+                    <div class="stat-label">Bond</div>
+                    <div class="progress-track"><div class="progress-fill" id="bar-bond"></div></div>
+                    <div class="stat-value" id="val-bond">0%</div>
+                </div>
+                <div class="stat-row" title="Mood">
+                    <div class="stat-label">Mood <span id="emoji-mood">😊</span></div>
+                    <div class="progress-track"><div class="progress-fill" id="bar-mood"></div></div>
+                    <div class="stat-value" id="val-mood">0%</div>
+                </div>
+                <div class="stat-row" title="Energy">
+                    <div class="stat-label">Energy <span id="emoji-energy">⚡</span></div>
+                    <div class="progress-track"><div class="progress-fill" id="bar-energy"></div></div>
+                    <div class="stat-value" id="val-energy">0%</div>
+                </div>
+                <div class="stat-row" title="Boredom">
+                    <div class="stat-label">Boredom <span id="emoji-boredom">😸</span></div>
+                    <div class="progress-track"><div class="progress-fill" id="bar-boredom"></div></div>
+                    <div class="stat-value" id="val-boredom">0%</div>
+                </div>
+                
+                <div class="tags-container" id="status-tags"></div>
+                <div class="tone-text" id="status-tone"></div>
+                
+                <button id="release-btn" class="danger-btn">Release Pet 😿</button>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="section-header">Interactions</div>
+        <div class="panel">
+            <div class="actions-grid">
+                <button class="primary-btn action-btn" data-action="play" disabled>🎮 Play</button>
+                <button class="primary-btn action-btn" data-action="learn" disabled>📚 Learn</button>
+                <button class="primary-btn action-btn" data-action="work" disabled>💼 Work</button>
+                <button class="primary-btn action-btn" data-action="pet" disabled>🤚 Pet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Container -->
+    <div class="chat-container">
+        <div class="header">
+            <div class="header-title">
+                🐱 MiaoAgent Chat
+                <span id="chat-pet-name" class="header-subtitle"></span>
+            </div>
+            <div class="chat-controls">
+                <div class="status-dot" id="status-dot" title="Checking status..."></div>
+                <button id="clear-btn" class="clear-btn">Clear</button>
+            </div>
+        </div>
+
+        <div class="chat-area" id="chat-area">
+            <div class="empty-state" id="empty-state">
+                <span>🐾</span>
+                <p>Select a pet to start chatting!</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="message-input" class="msg-input" placeholder="Type a message..." autocomplete="off" disabled>
+            <button id="send-btn" class="send-btn" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let currentPetId = null;
+        let currentPetName = '';
+        let currentOwnerId = '';
+
+        // DOM Elements
+        const ownerIdInput = document.getElementById('owner-id');
+        const adoptBtn = document.getElementById('adopt-btn');
+        const refreshPetsBtn = document.getElementById('refresh-pets-btn');
+        const petListEl = document.getElementById('pet-list');
+        const actionBtns = document.querySelectorAll('.action-btn');
+        const chatPetNameEl = document.getElementById('chat-pet-name');
+        const statusPanelContainer = document.getElementById('status-panel-container');
+        const releaseBtn = document.getElementById('release-btn');
+        
+        // Chat DOM
+        const chatArea = document.getElementById('chat-area');
+        const messageInput = document.getElementById('message-input');
+        const sendBtn = document.getElementById('send-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const statusDot = document.getElementById('status-dot');
+        const emptyState = document.getElementById('empty-state');
+        
+        let isChatLoading = false;
+
+        // Health Check
+        async function checkHealth() {
+            try {
+                const res = await fetch('/health');
+                if (res.ok) {
+                    statusDot.className = 'status-dot online';
+                    statusDot.title = 'Service Online';
+                } else {
+                    throw new Error('Not OK');
+                }
+            } catch (e) {
+                statusDot.className = 'status-dot offline';
+                statusDot.title = 'Service Offline';
+            }
+        }
+        checkHealth();
+
+        // Update UI State
+        function updateUIState() {
+            const hasPet = !!currentPetId;
+            const hasOwner = !!currentOwnerId;
+            const canInteract = hasPet && hasOwner;
+
+            actionBtns.forEach(btn => btn.disabled = !canInteract || isChatLoading);
+            messageInput.disabled = !canInteract;
+            sendBtn.disabled = !canInteract || isChatLoading;
+            
+            if (canInteract) {
+                chatPetNameEl.textContent = `| Chatting with: ${currentPetName || currentPetId}`;
+            } else {
+                chatPetNameEl.textContent = '';
+                statusPanelContainer.style.display = 'none';
+            }
+        }
+
+        // Owner Input Logic
+        ownerIdInput.addEventListener('input', (e) => {
+            currentOwnerId = e.target.value.trim();
+            updateUIState();
+            if (currentOwnerId) {
+                refreshPetList();
+            } else {
+                petListEl.innerHTML = '<div style="font-size: 0.85rem; color: #888; text-align: center; padding: 10px;">Enter Owner ID to see pets</div>';
+            }
+        });
+
+        // Adopt Logic
+        adoptBtn.addEventListener('click', async () => {
+            const errorEl = document.getElementById('adopt-error');
+            const resultEl = document.getElementById('adopt-result');
+            errorEl.classList.remove('active');
+            resultEl.classList.remove('active');
+            
+            const species = "cat";
+            const name = document.getElementById('adopt-name').value.trim();
+            const template = document.getElementById('adopt-template').value;
+            
+            if (!currentOwnerId) {
+                errorEl.textContent = 'Please enter an Owner ID first.';
+                errorEl.classList.add('active');
+                return;
+            }
+            if (!name) {
+                errorEl.textContent = 'Please enter a pet name.';
+                errorEl.classList.add('active');
+                return;
+            }
+
+            adoptBtn.disabled = true;
+            try {
+                const res = await fetch('/api/adopt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ owner_id: currentOwnerId, species, name, template })
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Adopt failed');
+                
+                resultEl.textContent = `🎉 Adopted! ${data.greeting || 'Say hello!'}`;
+                resultEl.classList.add('active');
+                document.getElementById('adopt-name').value = '';
+                
+                await refreshPetList();
+            } catch (err) {
+                errorEl.textContent = err.message;
+                errorEl.classList.add('active');
+            } finally {
+                adoptBtn.disabled = false;
+            }
+        });
+
+        // Refresh Pets Logic
+        refreshPetsBtn.addEventListener('click', refreshPetList);
+
+        // Release Logic
+        if (releaseBtn) {
+            releaseBtn.addEventListener('click', async () => {
+                if (!currentPetId || !currentOwnerId) return;
+                
+                const confirmed = confirm(`Are you sure you want to release ${currentPetName}? This cannot be undone.`);
+                if (!confirmed) return;
+                
+                releaseBtn.disabled = true;
+                try {
+                    const res = await fetch(`/api/pet/${currentPetId}/release`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ owner_id: currentOwnerId })
+                    });
+                    
+                    if (!res.ok) {
+                        const data = await res.json().catch(() => ({}));
+                        throw new Error(data.detail || 'Failed to release pet');
+                    }
+                    
+                    alert(`${currentPetName} has been released 😿`);
+                    
+                    currentPetId = null;
+                    currentPetName = '';
+                    updateUIState();
+                    
+                    // Clear chat area
+                    chatArea.innerHTML = '';
+                    const newEmpty = document.createElement('div');
+                    newEmpty.className = 'empty-state';
+                    newEmpty.id = 'empty-state';
+                    newEmpty.innerHTML = `<span>🐾</span><p>Select a pet to start chatting!</p>`;
+                    chatArea.appendChild(newEmpty);
+                    
+                    await refreshPetList();
+                } catch (err) {
+                    alert(err.message);
+                } finally {
+                    releaseBtn.disabled = false;
+                }
+            });
+        }
+
+        async function refreshPetList() {
+            const errorEl = document.getElementById('pets-error');
+            errorEl.classList.remove('active');
+            
+            if (!currentOwnerId) {
+                errorEl.textContent = 'Please enter an Owner ID.';
+                errorEl.classList.add('active');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/owner/${currentOwnerId}/pets`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Failed to fetch pets');
+                
+                renderPetList(data.pets || []);
+            } catch (err) {
+                errorEl.textContent = err.message;
+                errorEl.classList.add('active');
+            }
+        }
+
+        function renderPetList(pets) {
+            petListEl.innerHTML = '';
+            if (pets.length === 0) {
+                petListEl.innerHTML = '<div style="font-size: 0.85rem; color: #888; text-align: center; padding: 10px;">No pets yet.</div>';
+                return;
+            }
+
+            pets.forEach(pet => {
+                const row = document.createElement('div');
+                row.className = `pet-row ${currentPetId === pet.pet_id ? 'selected' : ''}`;
+                row.onclick = () => selectPet(pet);
+                
+                const emoji = '🐱';
+                
+                row.innerHTML = `
+                    <div class="pet-row-icon">${emoji}</div>
+                    <div class="pet-row-name">${pet.name}</div>
+                    <div class="pill-badge">${pet.bond_stage || 'New'}</div>
+                `;
+                petListEl.appendChild(row);
+            });
+        }
+
+        function selectPet(pet) {
+            currentPetId = pet.pet_id;
+            currentPetName = pet.name;
+            updateUIState();
+            
+            // Update selection visuals
+            Array.from(petListEl.children).forEach(row => {
+                row.classList.remove('selected');
+                if (row.querySelector('.pet-row-name').textContent === pet.name) {
+                    row.classList.add('selected');
+                }
+            });
+            
+            chatPetNameEl.textContent = `| Chatting with: ${pet.name}`;
+            
+            // Clear chat for new pet
+            chatArea.innerHTML = '';
+            const newEmpty = document.createElement('div');
+            newEmpty.className = 'empty-state';
+            newEmpty.id = 'empty-state';
+            newEmpty.innerHTML = `<span>🐾</span><p>Say hi to ${pet.name}!</p>`;
+            chatArea.appendChild(newEmpty);
+            
+            loadPetStatus();
+        }
+
+        // Status Logic
+        async function loadPetStatus() {
+            if (!currentPetId) return;
+            
+            try {
+                const res = await fetch(`/api/pet/${currentPetId}/status`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Failed to fetch status');
+                
+                statusPanelContainer.style.display = 'block';
+                
+                document.getElementById('status-name').textContent = data.name;
+                document.getElementById('status-stage').textContent = data.bond?.stage || 'Unknown';
+                
+                const bondPercent = Math.min(100, Math.max(0, (data.bond?.score || 0) * 100)).toFixed(2);
+                document.getElementById('bar-bond').style.width = `${bondPercent}%`;
+                document.getElementById('val-bond').textContent = `${bondPercent}%`;
+                
+                const moodPct = ((data.stats?.mood || 0) * 100).toFixed(2);
+                document.getElementById('bar-mood').style.width = `${moodPct}%`;
+                document.getElementById('val-mood').textContent = `${moodPct}%`;
+                
+                const energyPct = ((data.stats?.energy || 0) * 100).toFixed(2);
+                document.getElementById('bar-energy').style.width = `${energyPct}%`;
+                document.getElementById('val-energy').textContent = `${energyPct}%`;
+                
+                const boredomPct = ((data.stats?.boredom || 0) * 100).toFixed(2);
+                document.getElementById('bar-boredom').style.width = `${boredomPct}%`;
+                document.getElementById('val-boredom').textContent = `${boredomPct}%`;
+                
+                // Update emoji indicators
+                document.getElementById('emoji-mood').textContent = parseFloat(moodPct) >= 70 ? '😊' : parseFloat(moodPct) >= 40 ? '😐' : '😔';
+                document.getElementById('emoji-energy').textContent = parseFloat(energyPct) >= 70 ? '⚡' : parseFloat(energyPct) >= 40 ? '🔋' : '💤';
+                document.getElementById('emoji-boredom').textContent = parseFloat(boredomPct) >= 70 ? '😴' : parseFloat(boredomPct) >= 40 ? '😑' : '😸';
+                
+                const tagsEl = document.getElementById('status-tags');
+                tagsEl.innerHTML = '';
+                if (data.soul_summary?.personality_tags) {
+                    data.soul_summary.personality_tags.forEach(tag => {
+                        const t = document.createElement('span');
+                        t.className = 'pill-badge';
+                        t.textContent = tag;
+                        tagsEl.appendChild(t);
+                    });
+                }
+                
+                document.getElementById('status-tone').textContent = data.soul_summary?.tone || '';
+                
+            } catch (err) {
+                console.error('Error loading status:', err);
+            }
+        }
+
+        // Interaction Logic — buttons send chat messages
+        const ACTION_PROMPTS = {
+            play: '我们来玩吧！',
+            learn: '教我一些有趣的东西吧！',
+            work: '帮我做点事情吧。',
+            pet: '摸摸你～',
+        };
+
+        actionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const action = btn.dataset.action;
+                const prompt = ACTION_PROMPTS[action] || action;
+                messageInput.value = prompt;
+                sendMessage();
+            });
+        });
+
+        // Chat Logic
+        function getTime() {
+            const now = new Date();
+            return now.getHours().toString().padStart(2, '0') + ':' + 
+                   now.getMinutes().toString().padStart(2, '0');
+        }
+
+        function scrollToBottom() {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function appendMessage(sender, text, isError = false) {
+            const es = document.getElementById('empty-state');
+            if (es && es.parentNode) es.parentNode.removeChild(es);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${sender}`;
+            
+            const msgBubble = document.createElement('div');
+            msgBubble.className = `message ${sender} ${isError ? 'error' : ''}`;
+            msgBubble.textContent = text;
+            
+            const timestamp = document.createElement('div');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = getTime();
+
+            if (sender === 'user') {
+                wrapper.appendChild(msgBubble);
+                msgBubble.appendChild(timestamp);
+            } else {
+                wrapper.appendChild(msgBubble);
+                wrapper.appendChild(timestamp);
+            }
+
+            chatArea.appendChild(wrapper);
+            scrollToBottom();
+            return wrapper;
+        }
+
+        function showLoading() {
+            const es = document.getElementById('empty-state');
+            if (es && es.parentNode) es.parentNode.removeChild(es);
+            removeLoading();
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper bot loading';
+            wrapper.id = 'loading-indicator';
+            
+            const msgBubble = document.createElement('div');
+            msgBubble.className = 'message bot';
+            
+            const typing = document.createElement('div');
+            typing.className = 'typing-indicator';
+            typing.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+            
+            msgBubble.appendChild(typing);
+            wrapper.appendChild(msgBubble);
+            chatArea.appendChild(wrapper);
+            scrollToBottom();
+        }
+
+        function removeLoading() {
+            const loading = document.getElementById('loading-indicator');
+            if (loading) loading.remove();
+        }
+
+        function createBotMessageShell() {
+            const es = document.getElementById('empty-state');
+            if (es && es.parentNode) es.parentNode.removeChild(es);
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message-wrapper bot';
+            
+            const msgBubble = document.createElement('div');
+            msgBubble.className = 'message bot';
+            
+            const toolsContainer = document.createElement('div');
+            toolsContainer.className = 'tools-container';
+            
+            const markdownContainer = document.createElement('div');
+            markdownContainer.className = 'markdown-content';
+            
+            const timestamp = document.createElement('div');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = getTime();
+
+            msgBubble.appendChild(toolsContainer);
+            msgBubble.appendChild(markdownContainer);
+            
+            wrapper.appendChild(msgBubble);
+            wrapper.appendChild(timestamp);
+
+            return { wrapper, toolsContainer, markdownContainer };
+        }
+
+        const ACTION_TAG_RE = /<action>(play|learn|work|pet|chat)<\/action>/gi;
+
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            
+            if (!text || isChatLoading || !currentPetId || !currentOwnerId) return;
+            
+            appendMessage('user', text);
+            messageInput.value = '';
+            
+            isChatLoading = true;
+            updateUIState();
+            
+            showLoading();
+
+            try {
+                const abortController = new AbortController();
+                let sseTimeout;
+                const resetSseTimeout = () => {
+                    if (sseTimeout) clearTimeout(sseTimeout);
+                    sseTimeout = setTimeout(() => {
+                        abortController.abort();
+                    }, 180000); // 3 minutes idle timeout
+                };
+                resetSseTimeout();
+
+                const response = await fetch(`/api/pet/${currentPetId}/chat/stream`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ owner_id: currentOwnerId, message: text }),
+                    signal: abortController.signal,
+                });
+
+                if (!response.ok) {
+                    removeLoading();
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || `HTTP Error ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let doneReading = false;
+                
+                let botMessageWrapper = null;
+                let toolsContainer = null;
+                let markdownContainer = null;
+                let activeToolBlock = null;
+                
+                let fullStreamBuffer = "";
+                let thinkBuffer = "";
+                let buffer = "";
+                let currentEvent = null;
+                
+                let thinkingBlock = null;
+                let thinkingContent = null;
+                let thinkAccumulated = "";
+                let thinkingBlockFinalized = false;
+                
+                let currentThinkingIndicator = null;
+                
+                let workerProgressPanel = null;
+                let workerProgressBar = null;
+                let workerStepList = null;
+                let workerStepCount = 0;
+                let workerProgressPct = 0;
+                const workerStepMap = {};
+
+                let workerHeaderEl = null;
+                let workerStreamPulseCount = 0;
+
+                const ensureWorkerPanel = () => {
+                    if (workerProgressPanel) return;
+                    initBotMessage();
+                    workerProgressPanel = document.createElement('div');
+                    workerProgressPanel.className = 'worker-progress';
+                    workerProgressPanel.innerHTML =
+                        '<div class="worker-header"><div class="step-spinner"></div><span class="worker-header-text">大师技能运行中…</span></div>' +
+                        '<div class="worker-progress-bar-wrap"><div class="worker-progress-bar"></div></div>' +
+                        '<div class="worker-step-list"></div>';
+                    workerHeaderEl = workerProgressPanel.querySelector('.worker-header');
+                    workerProgressBar = workerProgressPanel.querySelector('.worker-progress-bar');
+                    workerStepList = workerProgressPanel.querySelector('.worker-step-list');
+                    botMessageWrapper.querySelector('.message.bot').appendChild(workerProgressPanel);
+                    if (thinkingBlock && thinkingBlock.parentElement !== workerProgressPanel) {
+                        workerProgressPanel.appendChild(thinkingBlock);
+                    }
+                };
+
+                const setWorkerPct = (pct) => {
+                    workerProgressPct = Math.min(100, pct);
+                    if (workerProgressBar) workerProgressBar.style.width = workerProgressPct + '%';
+                };
+
+                const bumpWorkerProgress = (delta, ceiling = 92) => {
+                    if (!workerProgressPanel) return;
+                    setWorkerPct(Math.min(ceiling, workerProgressPct + Math.max(0, delta || 0)));
+                };
+
+                const collapseWorkerPanel = () => {
+                    if (!workerProgressPanel || workerProgressPanel.dataset.collapsed) return;
+                    workerProgressPanel.dataset.collapsed = 'true';
+                    setWorkerPct(100);
+
+                    if (workerHeaderEl) {
+                        workerHeaderEl.classList.add('done');
+                        const txt = workerHeaderEl.querySelector('.worker-header-text');
+                        if (txt) txt.textContent = '大师技能完成';
+                    }
+
+                    setTimeout(() => {
+                        const summary = document.createElement('div');
+                        summary.className = 'worker-progress-summary';
+                        summary.innerHTML = `<span>✨</span> <span>已完成 ${workerStepCount} 项后台任务</span> <span style="font-size:0.8em;opacity:0.6">(点击展开)</span>`;
+                        
+                        const stepList = workerStepList;
+                        stepList.style.display = 'none';
+                        summary.addEventListener('click', () => {
+                            const isHidden = stepList.style.display === 'none';
+                            stepList.style.display = isHidden ? '' : 'none';
+                        });
+                        workerProgressPanel.insertBefore(summary, stepList);
+                    }, 500); // 0.5s delay to let the user see the final "done" state
+                };
+                
+                const showThinkingIndicator = (text) => {
+                    initBotMessage();
+                    if (!currentThinkingIndicator) {
+                        currentThinkingIndicator = document.createElement('div');
+                        currentThinkingIndicator.className = 'thinking-indicator';
+                        currentThinkingIndicator.innerHTML = '<span>⚙️</span> <span>' + (text || '处理中…') + '</span>';
+                        botMessageWrapper.querySelector('.message.bot').appendChild(currentThinkingIndicator);
+                        scrollToBottom();
+                    } else if (text) {
+                        currentThinkingIndicator.querySelector('span:last-child').textContent = text;
+                    }
+                };
+                
+                const hideThinkingIndicator = () => {
+                    if (currentThinkingIndicator) {
+                        currentThinkingIndicator.remove();
+                        currentThinkingIndicator = null;
+                    }
+                };
+                
+                const initBotMessage = () => {
+                    if (!botMessageWrapper) {
+                        const els = createBotMessageShell();
+                        botMessageWrapper = els.wrapper;
+                        toolsContainer = els.toolsContainer;
+                        markdownContainer = els.markdownContainer;
+                        chatArea.appendChild(botMessageWrapper);
+                    }
+                };
+
+                const ensureThinkingBlock = () => {
+                    initBotMessage();
+                    if (!thinkingBlock) {
+                        thinkingBlock = document.createElement('details');
+                        thinkingBlock.className = 'thinking-block';
+                        thinkingBlock.open = true;
+                        thinkingBlock.innerHTML = `<summary><span>🤔</span> <span>Agent Thinking Process</span></summary>`;
+                        
+                        thinkingContent = document.createElement('div');
+                        thinkingContent.className = 'thinking-content';
+                        thinkingBlock.appendChild(thinkingContent);
+                        
+                        const thoughtHost = workerProgressPanel || toolsContainer;
+                        thoughtHost.appendChild(thinkingBlock);
+                    } else {
+                        const thoughtHost = workerProgressPanel || toolsContainer;
+                        if (thinkingBlock.parentElement !== thoughtHost) {
+                            thoughtHost.appendChild(thinkingBlock);
+                        }
+                    }
+                };
+
+                const restartThinkingBlockIfFinalized = () => {
+                    if (!thinkingBlockFinalized) return;
+                    if (thinkingBlock) {
+                        thinkingBlock.remove();
+                    }
+                    thinkingBlock = null;
+                    thinkingContent = null;
+                    thinkAccumulated = "";
+                    thinkingBlockFinalized = false;
+                };
+
+                const updateThinkBlock = (chunk) => {
+                    if (!chunk) return;
+                    restartThinkingBlockIfFinalized();
+                    thinkAccumulated += chunk;
+                    ensureThinkingBlock();
+                    thinkingBlock.open = true;
+                    let span = thinkingContent.querySelector('.think-text');
+                    if (!span) {
+                        span = document.createElement('div');
+                        span.className = 'think-text';
+                        thinkingContent.insertBefore(span, thinkingContent.firstChild);
+                    }
+                    // Append text node to avoid full re-render flash (true typewriter append)
+                    span.appendChild(document.createTextNode(chunk));
+                };
+
+                const finalizeThinkBlock = () => {
+                    if (thinkingBlockFinalized || !thinkingBlock) return;
+                    thinkingBlockFinalized = true;
+                    if (thinkAccumulated.trim()) {
+                        let span = thinkingContent.querySelector('.think-text');
+                        if (span) {
+                            // Replace streamed text nodes with rendered markdown
+                            span.innerHTML = DOMPurify.sanitize(marked.parse(thinkAccumulated));
+                        }
+                    }
+                    // Update summary to signal it's collapsible
+                    const summaryTextEl = thinkingBlock.querySelector('summary span:last-child');
+                    if (summaryTextEl) summaryTextEl.textContent = '思考过程（点击展开）';
+                    // Delay collapse so user can see the rendered result briefly
+                    setTimeout(() => { thinkingBlock.open = false; }, 800);
+                };
+
+                const renderMarkdown = (text) => {
+                    markdownContainer.innerHTML = DOMPurify.sanitize(marked.parse(text));
+                };
+
+                let workerStreamTextBuf = "";
+                let workerInThoughtTag = false;
+                let workerInThinkTag = false;
+                const extractWorkerTextChannels = (chunk) => {
+                    if (!chunk) return { content: "", thoughts: [] };
+                    workerStreamTextBuf += chunk;
+                    let clean = "";
+                    const thoughts = [];
+
+                    while (true) {
+                        if (!workerInThoughtTag && !workerInThinkTag) {
+                            const thoughtPos = workerStreamTextBuf.indexOf('<thought>');
+                            const thinkPos = workerStreamTextBuf.indexOf('<think>');
+                            const candidates = [];
+                            if (thoughtPos !== -1) candidates.push([thoughtPos, 'thought']);
+                            if (thinkPos !== -1) candidates.push([thinkPos, 'think']);
+                            if (!candidates.length) {
+                                const safe = Math.max(0, workerStreamTextBuf.length - Math.max('<thought>'.length, '<think>'.length));
+                                clean += workerStreamTextBuf.slice(0, safe);
+                                workerStreamTextBuf = workerStreamTextBuf.slice(safe);
+                                break;
+                            }
+                            candidates.sort((a, b) => a[0] - b[0]);
+                            const [pos, tag] = candidates[0];
+                            clean += workerStreamTextBuf.slice(0, pos);
+                            workerStreamTextBuf = workerStreamTextBuf.slice(pos + (tag === 'thought' ? '<thought>'.length : '<think>'.length));
+                            if (tag === 'thought') workerInThoughtTag = true;
+                            else workerInThinkTag = true;
+                        } else if (workerInThoughtTag) {
+                            const end = workerStreamTextBuf.indexOf('</thought>');
+                            if (end === -1) break;
+                            const partial = workerStreamTextBuf.slice(0, end);
+                            if (partial) thoughts.push(partial);
+                            workerStreamTextBuf = workerStreamTextBuf.slice(end + '</thought>'.length);
+                            workerInThoughtTag = false;
+                        } else {
+                            const end = workerStreamTextBuf.indexOf('</think>');
+                            if (end === -1) {
+                                if (workerStreamTextBuf) thoughts.push(workerStreamTextBuf);
+                                workerStreamTextBuf = "";
+                                break;
+                            }
+                            const partial = workerStreamTextBuf.slice(0, end);
+                            if (partial) thoughts.push(partial);
+                            workerStreamTextBuf = workerStreamTextBuf.slice(end + '</think>'.length);
+                            workerInThinkTag = false;
+                        }
+                    }
+
+                    clean = clean.replace(ACTION_TAG_RE, '').replace(/\{"suggested_action"\s*:[^}]*\}/g, '');
+                    return { content: clean, thoughts };
+                };
+
+                while (!doneReading) {
+                    const { value, done } = await reader.read();
+                    if (done) {
+                        doneReading = true;
+                        break;
+                    }
+                    
+                    resetSseTimeout();
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('event: ')) {
+                            currentEvent = line.substring(7).trim();
+                        } else if (line.startsWith('data: ')) {
+                            const dataStr = line.substring(6).trim();
+                            if (!dataStr) continue;
+                            
+                            let data;
+                            try {
+                                data = JSON.parse(dataStr);
+                            } catch (e) {
+                                continue;
+                            }
+
+                            if (currentEvent === 'turn_start') {
+                                if (!document.getElementById('loading-indicator')) showLoading();
+                            } else if (currentEvent === 'thinking') {
+                                removeLoading();
+                                initBotMessage();
+                                bumpWorkerProgress(4, 80);
+                                if (data.text) {
+                                    updateThinkBlock(data.text);
+                                }
+                                scrollToBottom();
+                            } else if (currentEvent === 'tool_start') {
+                                removeLoading();
+                                initBotMessage();
+                                ensureThinkingBlock();
+                                activeToolBlock = document.createElement('div');
+                                activeToolBlock.className = 'tool-block';
+                                activeToolBlock.innerHTML = `<span>⚙️</span> <span>Using tool: <strong>${data.tool || 'unknown'}</strong>...</span>`;
+                                thinkingContent.appendChild(activeToolBlock);
+                                scrollToBottom();
+                            } else if (currentEvent === 'tool_output' || currentEvent === 'tool_complete') {
+                                if (activeToolBlock) {
+                                    activeToolBlock.innerHTML = `<span>✅</span> <span>Used tool: <strong>${data.tool || 'unknown'}</strong></span>`;
+                                    activeToolBlock = null;
+                                }
+                                scrollToBottom();
+                            } else if (currentEvent === 'llm_text' || currentEvent === 'message') {
+                                if (data.chunk || data.text || data.content) {
+                                    removeLoading();
+                                    initBotMessage();
+                                    finalizeThinkBlock();
+                                    
+                                    let textToRender = data.chunk || data.text || data.content || "";
+                                    fullStreamBuffer += textToRender;
+                                    
+                                    const cleanBuffer = fullStreamBuffer
+                                        .replace(ACTION_TAG_RE, '')
+                                        .replace(/\{"suggested_action"\s*:[^}]*\}/g, '')
+                                        .trimEnd();
+                                    
+                                    let contentText = "";
+                                    let thoughtText = thinkBuffer;
+                                    let tempStr = cleanBuffer;
+                                    
+                                    while (tempStr.includes('<thought>' )) {
+                                        let startIdx = tempStr.indexOf('<thought>' );
+                                        let endIdx = tempStr.indexOf('</thought>' , startIdx);
+                                        
+                                        contentText += tempStr.substring(0, startIdx);
+                                        
+                                        if (endIdx !== -1) {
+                                            thoughtText += tempStr.substring(startIdx + 9, endIdx) + "\n\n";
+                                            tempStr = tempStr.substring(endIdx + 10);
+                                        } else {
+                                            thoughtText += tempStr.substring(startIdx + 9) + "\n";
+                                            tempStr = "";
+                                            if (thinkingBlock) thinkingBlock.open = true;
+                                        }
+                                    }
+                                    contentText += tempStr;
+                                    
+                                    if (thoughtText.trim() !== thinkBuffer.trim()) {
+                                        thinkBuffer = thoughtText;
+                                        // <thought> tag path: render full buffer directly (not append-accumulate)
+                                        ensureThinkingBlock();
+                                        thinkingBlock.open = true;
+                                        let span = thinkingContent.querySelector('.think-text');
+                                        if (!span) {
+                                            span = document.createElement('div');
+                                            span.className = 'think-text';
+                                            thinkingContent.insertBefore(span, thinkingContent.firstChild);
+                                        }
+                                        span.textContent = thinkBuffer;                                    }
+                                    
+                                    if (contentText.trim()) {
+                                        renderMarkdown(contentText);
+                                    }
+                                    scrollToBottom();
+                                }
+                            } else if (currentEvent === 'worker_step') {
+                                ensureWorkerPanel();
+                                hideThinkingIndicator();
+                                const mapKey = data.call_id || data.tool;
+                                if (data.type === 'tool_start') {
+                                    workerStepCount++;
+                                    setWorkerPct(Math.min(85, workerProgressPct + 15));
+                                    const row = document.createElement('div');
+                                    row.className = 'worker-step running';
+                                    row.innerHTML = `<span class="step-icon"><div class="step-spinner"></div></span> <span class="step-text">${data.label || data.tool || '工具调用'}...</span>`;
+                                    workerStepList.appendChild(row);
+                                    workerStepMap[mapKey] = row;
+                                } else if (data.type === 'tool_done') {
+                                    bumpWorkerProgress(8, 95);
+                                    const row = workerStepMap[mapKey];
+                                    if (row) {
+                                        row.className = 'worker-step done';
+                                        const iconSpan = row.querySelector('.step-icon');
+                                        if (iconSpan) iconSpan.innerHTML = '✓';
+                                        const textSpan = row.querySelector('.step-text');
+                                        if (textSpan && textSpan.textContent.endsWith('...')) {
+                                            textSpan.textContent = textSpan.textContent.slice(0, -3);
+                                        }
+                                    }
+                                }
+                                scrollToBottom();
+                            } else if (currentEvent === 'worker_stream') {
+                                // Incremental streaming from A2A master
+                                ensureWorkerPanel();
+                                hideThinkingIndicator();
+                                workerStreamPulseCount++;
+                                if (!workerStepMap['__stream']) {
+                                    const row = document.createElement('div');
+                                    row.className = 'worker-step running';
+                                    row.innerHTML = `<span class="step-icon"><div class="step-spinner"></div></span> <span class="step-text">接收大师实时输出…</span>`;
+                                    workerStepList.appendChild(row);
+                                    workerStepMap['__stream'] = row;
+                                } else if (workerStreamPulseCount % 5 === 0) {
+                                    const row = workerStepMap['__stream'];
+                                    if (row) {
+                                        const textSpan = row.querySelector('.step-text');
+                                        if (textSpan) textSpan.textContent = `接收大师实时输出…（${workerStreamPulseCount}）`;
+                                    }
+                                }
+                                const channels = extractWorkerTextChannels(data.chunk || '');
+                                if (channels.thoughts.length) {
+                                    channels.thoughts.forEach((t) => updateThinkBlock(t));
+                                    bumpWorkerProgress(Math.min(6, channels.thoughts.length * 2), 90);
+                                }
+                                const contentChunk = channels.content;
+                                const artifactCard = botMessageWrapper.querySelector('.artifact-card.streaming-artifact');
+                                if (!artifactCard) {
+                                    // First chunk: create the streaming artifact card below worker panel
+                                    initBotMessage();
+                                    const card = document.createElement('div');
+                                    card.className = 'artifact-card markdown-content streaming-artifact';
+                                    botMessageWrapper.querySelector('.message.bot').appendChild(card);
+                                }
+                                const streamCard = botMessageWrapper.querySelector('.artifact-card.streaming-artifact');
+                                if (streamCard) {
+                                    if (!streamCard.dataset.streamBuffer) streamCard.dataset.streamBuffer = '';
+                                    if (contentChunk) {
+                                        streamCard.dataset.streamBuffer += contentChunk;
+                                    }
+                                    streamCard.innerHTML = DOMPurify.sanitize(marked.parse(streamCard.dataset.streamBuffer));
+                                    bumpWorkerProgress(Math.min(3, Math.max(1, Math.floor((contentChunk || '').length / 120))), 92);
+                                    scrollToBottom();
+                                }
+                            } else if (currentEvent === 'artifact') {
+                                removeLoading();
+                                hideThinkingIndicator();
+                                const streamRow = workerStepMap['__stream'];
+                                if (streamRow) {
+                                    streamRow.className = 'worker-step done';
+                                    const iconSpan = streamRow.querySelector('.step-icon');
+                                    if (iconSpan) iconSpan.innerHTML = '✓';
+                                    const textSpan = streamRow.querySelector('.step-text');
+                                    if (textSpan) textSpan.textContent = '大师实时输出已完成';
+                                }
+                                finalizeThinkBlock();
+                                collapseWorkerPanel();
+                                const existingCard = botMessageWrapper.querySelector('.artifact-card.streaming-artifact');
+                                if (existingCard) {
+                                    // Streaming already rendered — finalize
+                                    existingCard.classList.remove('streaming-artifact');
+                                } else {
+                                    // Non-streaming fallback: render full artifact at once
+                                    initBotMessage();
+                                    const artifactCard = document.createElement('div');
+                                    artifactCard.className = 'artifact-card markdown-content';
+                                    artifactCard.innerHTML = DOMPurify.sanitize(marked.parse(data.response || ''));
+                                    botMessageWrapper.querySelector('.message.bot').appendChild(artifactCard);
+                                }
+                                scrollToBottom();
+                            } else if (currentEvent === 'error') {
+                                removeLoading();
+                                hideThinkingIndicator();
+                                collapseWorkerPanel();
+                                messageInput.placeholder = 'Type a message...';
+                                appendMessage('bot', `Error: ${data.message || data.error || 'Unknown'}`, true);
+                            } else if (currentEvent === 'done') {
+                                removeLoading();
+                                hideThinkingIndicator();
+                                finalizeThinkBlock();
+                                collapseWorkerPanel();
+                                messageInput.placeholder = 'Type a message...';
+                            }
+                            
+                            currentEvent = null;
+                        }
+                    }
+                }
+                
+                removeLoading();
+                clearTimeout(sseTimeout);
+                loadPetStatus();
+                
+            } catch (error) {
+                removeLoading();
+                if (error.name === 'AbortError') {
+                    appendMessage('bot', '大师技能响应超时，请重试~', true);
+                } else {
+                    appendMessage('bot', `Error: ${error.message}`, true);
+                }
+            } finally {
+                isChatLoading = false;
+                updateUIState();
+                messageInput.focus();
+            }
+        }
+
+        // Chat Event Listeners
+        sendBtn.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        clearBtn.addEventListener('click', () => {
+            chatArea.innerHTML = '';
+            const newEmpty = document.createElement('div');
+            newEmpty.className = 'empty-state';
+            newEmpty.id = 'empty-state';
+            if (currentPetId) {
+                const petName = chatPetNameEl.textContent.replace('| Chatting with: ', '');
+                newEmpty.innerHTML = `<span>🐾</span><p>Say hi to ${petName}!</p>`;
+            } else {
+                newEmpty.innerHTML = `<span>🐾</span><p>Select a pet to start chatting!</p>`;
+            }
+            chatArea.appendChild(newEmpty);
+        });
+    </script>
+</body>
+</html>
