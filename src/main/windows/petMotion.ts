@@ -26,7 +26,8 @@ type MotionMode = 'rest' | 'move' | 'drag' | 'locked'
 const TICK_MS = 33
 const EDGE_PADDING = 24
 const CORNER_WANDER_RADIUS = 96
-const CORNER_LOCK_INTERVAL = 45000
+const CORNER_LOCK_INTERVAL = 25000
+const CORNER_LOCK_DURATION = 20000
 const DRAG_CORNER_REST_MS = 18000
 const DRAG_EDGE_SNAP_DISTANCE = 96
 const PASSIVE_ACTIONS: PetAction[] = ['stand', 'sit', 'stretch', 'groom', 'lie', 'sleep', 'meow']
@@ -37,6 +38,12 @@ export function getPetMotionController(petWindow: BrowserWindow): PetMotionContr
 }
 
 export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
+  // Freeze the intended window size at creation to avoid DPI-rounding drift.
+  // On Windows with non-integer DPI scaling, getPosition / setPosition can cause
+  // getBounds().width/height to grow by ~1 px per call, shrinking the movement area.
+  const winWidth = petWindow.getBounds().width
+  const winHeight = petWindow.getBounds().height
+
   let mode: MotionMode = 'rest'
   let target: Point | null = null
   let action: PetAction = 'stand'
@@ -44,6 +51,7 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
   let nextDecisionAt = Date.now() + 2500
   let nextCornerLockAt = Date.now() + CORNER_LOCK_INTERVAL
   let shouldLockOnArrival = false
+  let unlockAt = 0
   let dragOffset: Point | null = null
   let dragDisplayBounds: Rectangle | null = null
   let timer: NodeJS.Timeout | null = null
@@ -62,28 +70,42 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
     }
   }
 
+  /** Move window without letting DPI rounding drift the size. */
+  const moveWindow = (x: number, y: number): void => {
+    if (petWindow.isDestroyed()) return
+    petWindow.setBounds({ x, y, width: winWidth, height: winHeight }, false)
+  }
+
+  const getWindowPos = (): Point => {
+    const b = petWindow.getBounds()
+    return { x: b.x, y: b.y }
+  }
+
   const getWindowCenter = (): Point => {
-    const bounds = petWindow.getBounds()
+    const pos = getWindowPos()
     return {
-      x: bounds.x + bounds.width / 2,
-      y: bounds.y + bounds.height / 2
+      x: pos.x + winWidth / 2,
+      y: pos.y + winHeight / 2
     }
   }
 
   const getPetDisplay = () => {
-    const bounds = petWindow.getBounds()
-    const matchingDisplay = screen.getDisplayMatching(bounds)
+    const pos = getWindowPos()
+    const matchingDisplay = screen.getDisplayMatching({
+      ...pos,
+      width: winWidth,
+      height: winHeight
+    })
     if (matchingDisplay) return matchingDisplay
 
     return screen.getDisplayNearestPoint(getWindowCenter())
   }
 
   const getMovementArea = (padding = EDGE_PADDING, fullDisplay = false): MovementArea => {
-    const bounds = petWindow.getBounds()
     const display = getPetDisplay()
     const area = fullDisplay ? display.bounds : display.workArea
-    const maxX = Math.max(area.x + padding, area.x + area.width - bounds.width - padding)
-    const maxY = Math.max(area.y + padding, area.y + area.height - bounds.height - padding)
+    const maxX = Math.max(area.x + padding, area.x + area.width - winWidth - padding)
+    const maxY = Math.max(area.y + padding, area.y + area.height - winHeight - padding)
 
     return {
       minX: area.x + padding,
@@ -108,25 +130,24 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
     if (!dragOffset) return null
 
     const cursor = screen.getCursorScreenPoint()
-    const bounds = petWindow.getBounds()
-    const displayBounds = dragDisplayBounds ?? screen.getDisplayNearestPoint(cursor).bounds
-    const minX = displayBounds.x
-    const minY = displayBounds.y
-    const maxX = displayBounds.x + displayBounds.width - bounds.width
-    const maxY = displayBounds.y + displayBounds.height - bounds.height
+    const area = dragDisplayBounds ?? screen.getDisplayNearestPoint(cursor).workArea
+    const minX = area.x
+    const minY = area.y
+    const maxX = area.x + area.width - winWidth
+    const maxY = area.y + area.height - winHeight
 
     let nextX = cursor.x - dragOffset.x
     let nextY = cursor.y - dragOffset.y
 
-    if (cursor.x <= displayBounds.x + DRAG_EDGE_SNAP_DISTANCE) {
+    if (cursor.x <= area.x + DRAG_EDGE_SNAP_DISTANCE) {
       nextX = minX
-    } else if (cursor.x >= displayBounds.x + displayBounds.width - DRAG_EDGE_SNAP_DISTANCE) {
+    } else if (cursor.x >= area.x + area.width - DRAG_EDGE_SNAP_DISTANCE) {
       nextX = maxX
     }
 
-    if (cursor.y <= displayBounds.y + DRAG_EDGE_SNAP_DISTANCE) {
+    if (cursor.y <= area.y + DRAG_EDGE_SNAP_DISTANCE) {
       nextY = minY
-    } else if (cursor.y >= displayBounds.y + displayBounds.height - DRAG_EDGE_SNAP_DISTANCE) {
+    } else if (cursor.y >= area.y + area.height - DRAG_EDGE_SNAP_DISTANCE) {
       nextY = maxY
     }
 
@@ -137,11 +158,9 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
   }
 
   const updateDragPosition = (): void => {
-    if (petWindow.isDestroyed()) return
-
     const nextPoint = getDragPoint()
     if (!nextPoint) return
-    petWindow.setPosition(nextPoint.x, nextPoint.y, false)
+    moveWindow(nextPoint.x, nextPoint.y)
   }
 
   const randomPoint = (): Point => {
@@ -218,8 +237,8 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
     shouldLockOnArrival = false
     const nextAction = PASSIVE_ACTIONS[Math.floor(Math.random() * PASSIVE_ACTIONS.length)]
     sendAction(nextAction)
-    const bounds = petWindow.getBounds()
-    const restDuration = isNearCorner(bounds)
+    const pos = getWindowPos()
+    const restDuration = isNearCorner(pos)
       ? 9000 + Math.random() * 9000
       : 2500 + Math.random() * 6500
     nextDecisionAt = Date.now() + restDuration
@@ -229,8 +248,8 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
     mode = 'move'
     target = nextTarget
     shouldLockOnArrival = lockOnArrival
-    const bounds = petWindow.getBounds()
-    const nextDirection: PetDirection = target.x < bounds.x ? 'left' : 'right'
+    const pos = getWindowPos()
+    const nextDirection: PetDirection = target.x < pos.x ? 'left' : 'right'
     sendAction(Math.random() > 0.72 ? 'run' : 'walk', nextDirection)
   }
 
@@ -246,7 +265,17 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
     }
 
     const now = Date.now()
-    if (mode === 'drag' || mode === 'locked') return
+    if (mode === 'drag') return
+    if (mode === 'locked') {
+      if (now >= unlockAt) {
+        mode = 'rest'
+        target = null
+        shouldLockOnArrival = false
+        sendAction('stand')
+        nextDecisionAt = Date.now() + 2000
+      }
+      return
+    }
 
     if (mode === 'rest') {
       if (now >= nextDecisionAt) {
@@ -262,23 +291,23 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
       return
     }
 
-    let bounds = petWindow.getBounds()
-    const clampedBounds = clampPoint(bounds)
-    if (clampedBounds.x !== bounds.x || clampedBounds.y !== bounds.y) {
-      petWindow.setPosition(clampedBounds.x, clampedBounds.y, false)
-      bounds = { ...bounds, x: clampedBounds.x, y: clampedBounds.y }
+    const pos = getWindowPos()
+    const clampedPos = clampPoint(pos, 0)
+    if (clampedPos.x !== pos.x || clampedPos.y !== pos.y) {
+      moveWindow(clampedPos.x, clampedPos.y)
     }
-    const dx = target.x - bounds.x
-    const dy = target.y - bounds.y
+    const dx = target.x - clampedPos.x
+    const dy = target.y - clampedPos.y
     const distance = Math.hypot(dx, dy)
 
     if (distance <= 3) {
-      const nextPoint = clampPoint(target)
-      petWindow.setPosition(nextPoint.x, nextPoint.y, false)
+      const nextPoint = clampPoint(target, 0)
+      moveWindow(nextPoint.x, nextPoint.y)
       if (shouldLockOnArrival) {
         mode = 'locked'
         target = null
         shouldLockOnArrival = false
+        unlockAt = Date.now() + CORNER_LOCK_DURATION + Math.random() * 10000
         sendAction(Math.random() > 0.45 ? 'sit' : 'sleep')
         return
       }
@@ -288,14 +317,17 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
 
     const speed = action === 'run' ? 4.8 : 2.4
     const step = Math.min(speed, distance)
-    const nextPoint = clampPoint({
-      x: bounds.x + (dx / distance) * step,
-      y: bounds.y + (dy / distance) * step
-    })
+    const nextPoint = clampPoint(
+      {
+        x: clampedPos.x + (dx / distance) * step,
+        y: clampedPos.y + (dy / distance) * step
+      },
+      0
+    )
     const nextDirection: PetDirection = dx < 0 ? 'left' : 'right'
 
     sendAction(action === 'run' ? 'run' : 'walk', nextDirection)
-    petWindow.setPosition(nextPoint.x, nextPoint.y, false)
+    moveWindow(nextPoint.x, nextPoint.y)
   }
 
   petWindow.webContents.once('did-finish-load', () => {
@@ -304,15 +336,15 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
 
   const controller: PetMotionController = {
     startDrag: () => {
-      const bounds = petWindow.getBounds()
+      const pos = getWindowPos()
       const cursor = screen.getCursorScreenPoint()
-      dragDisplayBounds = getPetDisplay().bounds
+      dragDisplayBounds = getPetDisplay().workArea
       mode = 'drag'
       target = null
       shouldLockOnArrival = false
       dragOffset = {
-        x: cursor.x - bounds.x,
-        y: cursor.y - bounds.y
+        x: cursor.x - pos.x,
+        y: cursor.y - pos.y
       }
       sendAction('stand')
       if (dragTimer) clearInterval(dragTimer)
@@ -332,7 +364,8 @@ export function startPetMotion(petWindow: BrowserWindow): PetMotionController {
       mode = 'rest'
       target = null
       shouldLockOnArrival = false
-      if (isNearCorner(petWindow.getBounds(), 0, true)) {
+      const pos = getWindowPos()
+      if (isNearCorner(pos, 0)) {
         sendAction(Math.random() > 0.5 ? 'sit' : 'sleep')
         nextDecisionAt = Date.now() + DRAG_CORNER_REST_MS
       } else {
