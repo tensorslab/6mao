@@ -75,11 +75,13 @@ export interface PetDragPayload {
 export interface PetSwitchPayload {
   petId: string
   name?: string
+  template?: string
 }
 
 export interface PetCurrentPayload {
   petId: string
   name: string
+  template?: string
 }
 
 export interface PetEmotionPayload {

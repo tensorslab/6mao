@@ -24,6 +24,7 @@ export function SuccessCelebration({ pet, totalCount, onStartChat }: SuccessCele
       const timer = setTimeout(() => setShowBondTip(true), 1000)
       return () => clearTimeout(timer)
     }
+    return undefined
   }, [stage])
 
   const handleSaveCard = () => {

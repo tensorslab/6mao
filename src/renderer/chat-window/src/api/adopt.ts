@@ -14,7 +14,10 @@ export function adoptPet(payload: AdoptRequest): Promise<Pet> {
     signal: controller.signal
   })
     .then((data) => {
-      if (data.pet) return data.pet
+      if (data.pet) {
+        // 确保 template 存在：优先用 API 返回值，回退到请求参数
+        return { ...data.pet, template: data.pet.template ?? payload.template }
+      }
 
       return {
         pet_id: data.pet_id ?? `${payload.owner_id}-${Date.now()}`,

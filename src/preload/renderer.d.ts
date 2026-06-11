@@ -15,9 +15,11 @@ export interface ElectronAPI {
   resumePetMotion: () => void
   notifyPetEmotion: (emotion: PetEmotion) => void
   notifyPetAction: (action: PetAction) => void
-  setCurrentPet: (pet: { petId: string; name: string }) => void
-  onPetSwitch: (callback: (petId: string) => void) => () => void
-  onCurrentPet: (callback: (pet: { petId: string; name: string }) => void) => () => void
+  setCurrentPet: (pet: { petId: string; name: string; template?: string }) => void
+  onPetSwitch: (callback: (petId: string, template?: string) => void) => () => void
+  onCurrentPet: (
+    callback: (pet: { petId: string; name: string; template?: string }) => void
+  ) => () => void
   onPetEmotion: (callback: (emotion: PetEmotion) => void) => () => void
   onPetAction: (callback: (payload: PetActionPayload) => void) => () => void
   onPetProactive: (callback: (payload: PetProactivePayload) => void) => () => void

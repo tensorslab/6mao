@@ -2,7 +2,7 @@ import type { PetAction } from '../../../../shared/ipc-channels'
 import type { SpriteActionConfig, SpriteAssetConfig } from '../types'
 
 import yellowCatPreview from '../../../../../resources/yellow_cat/cat.png?url'
-import standFrame01 from '../../../../../resources/yellow_cat/stand/stand_00001_.png?url'
+import standFrame01 from '../../../../../resources/yellow_cat/00_stand/00_stand_00001_.png?url'
 
 type FrameModule = { default: string } | string
 
@@ -58,8 +58,8 @@ function createActionConfig(
 
 const standModules = import.meta.glob(
   [
-    '../../../../../resources/yellow_cat/stand/*.png',
-    '!../../../../../resources/yellow_cat/stand/stand_00001_.png'
+    '../../../../../resources/yellow_cat/00_stand/*.png',
+    '!../../../../../resources/yellow_cat/00_stand/00_stand_00001_.png'
   ],
   {
     query: '?url',

@@ -28,18 +28,18 @@ const electronAPI = {
     ipcRenderer.send(IPC_CHANNELS.PET_EMOTION, { emotion } satisfies PetEmotionPayload),
   notifyPetAction: (action: PetAction) =>
     ipcRenderer.send(IPC_CHANNELS.PET_ACTION, { action } satisfies PetActionPayload),
-  setCurrentPet: (pet: { petId: string; name: string }) =>
+  setCurrentPet: (pet: { petId: string; name: string; template?: string }) =>
     ipcRenderer.send(IPC_CHANNELS.PET_CURRENT, pet satisfies PetCurrentPayload),
-  onPetSwitch: (callback: (petId: string) => void) => {
+  onPetSwitch: (callback: (petId: string, template?: string) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, payload: PetSwitchPayload) => {
-      callback(payload.petId)
+      callback(payload.petId, payload.template)
     }
     ipcRenderer.on(IPC_CHANNELS.PET_SWITCH, listener)
     return () => ipcRenderer.removeListener(IPC_CHANNELS.PET_SWITCH, listener)
   },
-  onCurrentPet: (callback: (pet: { petId: string; name: string }) => void) => {
+  onCurrentPet: (callback: (pet: { petId: string; name: string; template?: string }) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, payload: PetCurrentPayload) => {
-      callback({ petId: payload.petId, name: payload.name })
+      callback({ petId: payload.petId, name: payload.name, template: payload.template })
     }
     ipcRenderer.on(IPC_CHANNELS.PET_CURRENT, listener)
     return () => ipcRenderer.removeListener(IPC_CHANNELS.PET_CURRENT, listener)

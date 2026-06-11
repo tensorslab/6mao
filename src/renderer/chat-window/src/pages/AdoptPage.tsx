@@ -66,7 +66,6 @@ export function AdoptPage({
   const queryClient = useQueryClient()
   const [name, setName] = useState('六毛')
   const [templateId, setTemplateId] = useState<string | null>(null)
-  const [isFocused, setIsFocused] = useState(false)
 
   const selectedTemplate = templates.find((t) => t.id === templateId)
 
@@ -112,8 +111,6 @@ export function AdoptPage({
           }`}
           value={name}
           disabled={isMaxPets}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
           onChange={(event) => setName(event.target.value)}
           placeholder="比如：六毛"
         />

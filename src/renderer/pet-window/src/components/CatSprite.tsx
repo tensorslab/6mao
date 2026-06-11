@@ -63,15 +63,15 @@ export function CatSprite({
     dragged: boolean
   } | null>(null)
   const suppressClickRef = useRef(false)
+  const [loadedFramesByAction, setLoadedFramesByAction] = useState<
+    Partial<Record<PetAction, string[]>>
+  >({})
   const actionConfig =
     config.spriteAsset?.actions[action] ??
     config.spriteAsset?.actions[config.spriteAsset.defaultAction]
   const initialFrames = useMemo(() => {
     return actionConfig?.frames.length ? actionConfig.frames : [config.spritePath]
   }, [actionConfig, config.spritePath])
-  const [loadedFramesByAction, setLoadedFramesByAction] = useState<
-    Partial<Record<PetAction, string[]>>
-  >({})
   const loadedFrames = loadedFramesByAction[action]
   const frames = loadedFrames?.length ? loadedFrames : initialFrames
   const framesLoaded = Boolean(loadedFrames?.length)
@@ -153,7 +153,6 @@ export function CatSprite({
       onPointerMove={moveDrag}
       onPointerUp={endDrag}
       aria-label={`和 ${pet.name} 聊天`}
-      title={`和 ${pet.name} 聊天`}
     >
       <div
         className={`pointer-events-none absolute inset-0 transition-transform duration-300 group-hover:scale-105 ${
@@ -163,17 +162,21 @@ export function CatSprite({
               ? 'grayscale'
               : ''
         }`}
-        style={{ transform: direction === 'left' ? 'scaleX(-1)' : undefined }}
       >
-        <CatAnimation
-          key={action}
-          action={action}
-          frames={frames}
-          fps={actionConfig?.fps ?? 10}
-          loop={actionConfig?.loop ?? true}
-          alt={config.displayName}
-          onComplete={onActionComplete}
-        />
+        <div
+          className="h-full w-full"
+          style={{ transform: direction === 'left' ? 'scaleX(-1)' : undefined }}
+        >
+          <CatAnimation
+            key={action}
+            action={action}
+            frames={frames}
+            fps={actionConfig?.fps ?? 10}
+            loop={actionConfig?.loop ?? true}
+            alt={config.displayName}
+            onComplete={onActionComplete}
+          />
+        </div>
       </div>
       <span
         className="pointer-events-none absolute bottom-3 left-1/2 h-4 w-24 -translate-x-1/2 rounded-full opacity-20 blur-md"

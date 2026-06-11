@@ -64,6 +64,11 @@ export function App() {
   const handleStartChat = () => {
     if (adoptedPet) {
       setCurrentPetId(adoptedPet.pet_id)
+      window.electronAPI.setCurrentPet({
+        petId: adoptedPet.pet_id,
+        name: adoptedPet.name,
+        template: adoptedPet.template
+      })
       setAdoptedPet(null)
       setView('chat')
     }
@@ -89,17 +94,41 @@ export function App() {
       }
 
       setCurrentPetId(petId)
+      const pet = pets.find((p) => p.pet_id === petId)
+      if (pet) {
+        window.electronAPI.setCurrentPet({
+          petId: pet.pet_id,
+          name: pet.name,
+          template: pet.template
+        })
+      }
       setView('chat')
     })
-  }, [setCurrentPetId])
+  }, [setCurrentPetId, pets])
 
+  // 聊天窗口加载时或活跃猫咪变化时，通知宠物窗口更新外观
+  // 仅在 pet_id 或 template 实际变化时触发，避免对象引用变化导致反复发送
   useEffect(() => {
-    if (!activePet) return
-    window.electronAPI.setCurrentPet({ petId: activePet.pet_id, name: activePet.name })
-  }, [activePet])
+    if (activePet?.pet_id && activePet?.template) {
+      window.electronAPI.setCurrentPet({
+        petId: activePet.pet_id,
+        name: activePet.name,
+        template: activePet.template
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePet?.pet_id, activePet?.template])
 
   const selectPet = (petId: string): void => {
     setCurrentPetId(petId)
+    const pet = pets.find((p) => p.pet_id === petId)
+    if (pet) {
+      window.electronAPI.setCurrentPet({
+        petId: pet.pet_id,
+        name: pet.name,
+        template: pet.template
+      })
+    }
     setView('chat')
   }
 
@@ -165,6 +194,7 @@ export function App() {
               ownerId={ownerId}
               status={statusQuery.data}
               statusLoading={statusQuery.isLoading}
+              template={activePet.template}
             />
           ) : (
             <PetListPage

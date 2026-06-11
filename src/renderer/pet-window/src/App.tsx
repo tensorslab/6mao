@@ -6,6 +6,7 @@ import type {
   PetRenderMode
 } from '../../../shared/ipc-channels'
 import { PetRenderer } from './components/PetRenderer'
+import { templateToCharacterId } from './personality'
 import type { RenderPet } from './types'
 
 const DEFAULT_PET: RenderPet = {
@@ -113,8 +114,12 @@ export function App() {
 
   // Listen for pet switch events
   useEffect(() => {
-    const removeSwitchListener = window.electronAPI.onPetSwitch((petId) => {
-      setPet((current) => ({ ...current, id: petId }))
+    const removeSwitchListener = window.electronAPI.onPetSwitch((petId, template) => {
+      setPet((current) => ({
+        ...current,
+        id: petId,
+        personality: templateToCharacterId(template)
+      }))
     })
     return removeSwitchListener
   }, [])
@@ -164,7 +169,8 @@ export function App() {
       setPet((existing) => ({
         ...existing,
         id: currentPet.petId,
-        name: currentPet.name
+        name: currentPet.name,
+        personality: templateToCharacterId(currentPet.template)
       }))
     })
   }, [])
@@ -208,6 +214,7 @@ export function App() {
     <main className="relative flex h-full w-full items-center justify-center overflow-hidden bg-transparent">
       <div className="relative h-[240px] w-[240px] shrink-0">
         <PetRenderer
+          key={pet.personality}
           pet={pet}
           emotion={emotion}
           action={action}

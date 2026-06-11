@@ -1,5 +1,22 @@
-import { Cat, Plus, Trash2 } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import type { Pet } from '../api/types'
+import blackAndWhiteCatPreview from '../../../../../resources/black_and_white/cat.png?url'
+import yellowCatPreview from '../../../../../resources/yellow_cat/cat.png?url'
+
+const TEMPLATE_PREVIEW: Record<string, string> = {
+  'cat-default': blackAndWhiteCatPreview,
+  'cat-tsundere': blackAndWhiteCatPreview,
+  'cat-philosopher': blackAndWhiteCatPreview,
+  'cat-lazy': blackAndWhiteCatPreview,
+  'cat-clingy': yellowCatPreview,
+  'cat-social': yellowCatPreview,
+  'cat-mischief': yellowCatPreview
+}
+
+function getCatPreview(template?: string): string {
+  if (!template) return blackAndWhiteCatPreview
+  return TEMPLATE_PREVIEW[template] ?? blackAndWhiteCatPreview
+}
 
 export function PetListPage({
   pets,
@@ -55,11 +72,15 @@ export function PetListPage({
               onClick={() => onSelect(pet.pet_id)}
             >
               <div
-                className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl text-white ${
-                  isNew ? 'bg-[#f07f61] shadow-md shadow-[#f07f61]/20' : 'bg-[#f4b860]'
+                className={`h-12 w-12 shrink-0 overflow-hidden rounded-2xl ${
+                  isNew ? 'shadow-md shadow-[#f07f61]/20' : ''
                 }`}
               >
-                <Cat />
+                <img
+                  src={getCatPreview(pet.template)}
+                  alt={pet.name}
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -87,7 +108,6 @@ export function PetListPage({
           </div>
         )
       })}
-
 
       {!loading && pets.length === 0 ? (
         <div className="rounded-[28px] border border-dashed border-[#f07f61]/40 bg-white/65 p-6 text-center">

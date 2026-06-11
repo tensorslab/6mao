@@ -1,4 +1,5 @@
 import type { CharacterConfig, CharacterId } from './types'
+import { blackAndWhiteCatAsset } from './assets/blackAndWhiteCat'
 import { yellowCatAsset } from './assets/yellowCat'
 
 /** 半山喵事处 · 六位喵掌事
@@ -14,8 +15,8 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '算盘、卷宗、深蓝小袄',
     masterSkill: '主理 · 账房（统筹、调度、记账）',
     modelPath: '/models/scholar/scholar.model3.json',
-    spritePath: yellowCatAsset.previewPath,
-    spriteAsset: yellowCatAsset,
+    spritePath: blackAndWhiteCatAsset.previewPath,
+    spriteAsset: blackAndWhiteCatAsset,
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 8000
@@ -44,8 +45,8 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '蓝围裙、红格方巾、扳手',
     masterSkill: '器物 · 修补（错误恢复、调试）',
     modelPath: '/models/mechanic/mechanic.model3.json',
-    spritePath: yellowCatAsset.previewPath,
-    spriteAsset: yellowCatAsset,
+    spritePath: blackAndWhiteCatAsset.previewPath,
+    spriteAsset: blackAndWhiteCatAsset,
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 9500
@@ -74,8 +75,8 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '圆框眼镜、卷轴、砚台',
     masterSkill: '查书 · 检索（搜索、读文档）',
     modelPath: '/models/student/student.model3.json',
-    spritePath: yellowCatAsset.previewPath,
-    spriteAsset: yellowCatAsset,
+    spritePath: blackAndWhiteCatAsset.previewPath,
+    spriteAsset: blackAndWhiteCatAsset,
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 7500
@@ -95,6 +96,32 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     talkMotion: 'talk',
     idleInterval: 6500
   }
+}
+
+/** 后端 template ID → 视觉角色映射
+ *  social/clingy/mischief → 黄猫 (tea/messenger/artist)
+ *  default/tsundere/philosopher/lazy → 黑白猫 (scholar/student/mechanic)
+ */
+export const TEMPLATE_TO_CHARACTER: Record<string, CharacterId> = {
+  'cat-default': 'scholar',
+  'cat-tsundere': 'student',
+  'cat-clingy': 'tea',
+  'cat-social': 'messenger',
+  'cat-philosopher': 'mechanic',
+  'cat-mischief': 'artist',
+  'cat-lazy': 'mechanic'
+}
+
+/** 根据 template 获取角色 ID，未知 template 默认 scholar */
+export function templateToCharacterId(template?: string): CharacterId {
+  if (!template) return 'scholar'
+  return TEMPLATE_TO_CHARACTER[template] ?? 'scholar'
+}
+
+/** 根据 template 判断是否为黄猫外观 */
+export function isYellowCat(template?: string): boolean {
+  const characterId = templateToCharacterId(template)
+  return CHARACTER_CONFIGS[characterId]?.spriteAsset === yellowCatAsset
 }
 
 /** 向后兼容别名 */

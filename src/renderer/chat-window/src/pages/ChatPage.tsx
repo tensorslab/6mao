@@ -11,12 +11,14 @@ export function ChatPage({
   petId,
   ownerId,
   status,
-  statusLoading
+  statusLoading,
+  template
 }: {
   petId: string
   ownerId: string
   status?: PetStatus
   statusLoading: boolean
+  template?: string
 }) {
   const [input, setInput] = useState('')
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -43,7 +45,7 @@ export function ChatPage({
 
   return (
     <section className="flex h-full flex-col gap-4">
-      <StatusPanel status={status} loading={statusLoading} />
+      <StatusPanel status={status} loading={statusLoading} template={template} />
 
       <div className="flex min-h-0 flex-1 flex-col rounded-[28px] border border-white/60 bg-white/70 shadow-xl shadow-[#2c2118]/10 backdrop-blur">
         <div className="flex items-center justify-between border-b border-[#2c2118]/10 px-4 py-3">

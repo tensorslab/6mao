@@ -1,4 +1,22 @@
 import type { PetStatus } from '../api/types'
+import blackAndWhiteCatPreview from '../../../../../resources/black_and_white/cat.png?url'
+import yellowCatPreview from '../../../../../resources/yellow_cat/cat.png?url'
+
+/** 后端 template → 猫咪外观预览图 */
+const TEMPLATE_PREVIEW: Record<string, string> = {
+  'cat-default': blackAndWhiteCatPreview,
+  'cat-tsundere': blackAndWhiteCatPreview,
+  'cat-philosopher': blackAndWhiteCatPreview,
+  'cat-lazy': blackAndWhiteCatPreview,
+  'cat-clingy': yellowCatPreview,
+  'cat-social': yellowCatPreview,
+  'cat-mischief': yellowCatPreview
+}
+
+function getCatPreview(template?: string): string {
+  if (!template) return blackAndWhiteCatPreview
+  return TEMPLATE_PREVIEW[template] ?? blackAndWhiteCatPreview
+}
 
 const fallbackStatus: PetStatus = {
   name: '六毛',
@@ -33,10 +51,19 @@ function toPercent(value: unknown): number {
   return Math.max(0, Math.min(100, Math.round(numericValue * 100)))
 }
 
-export function StatusPanel({ status, loading }: { status?: PetStatus; loading: boolean }) {
+export function StatusPanel({
+  status,
+  loading,
+  template
+}: {
+  status?: PetStatus
+  loading: boolean
+  template?: string
+}) {
   const view = status ?? fallbackStatus
   const stats = view.stats ?? fallbackStatus.stats
   const bondPercent = toPercent(view.bond?.score)
+  const catPreview = getCatPreview(template)
 
   return (
     <section className="rounded-[28px] border border-white/60 bg-white/70 p-4 shadow-xl shadow-[#2c2118]/10 backdrop-blur">
@@ -46,8 +73,16 @@ export function StatusPanel({ status, loading }: { status?: PetStatus; loading: 
           <h2 className="text-2xl font-black text-[#2c2118]">{bondPercent}%</h2>
           <p className="text-xs font-bold text-[#2c2118]/55">{view.bond?.stage ?? 'Unknown'}</p>
         </div>
-        <div className="grid h-16 w-16 place-items-center rounded-full bg-[#f4b860] text-lg font-black text-white shadow-lg">
-          {loading ? '...' : '喵'}
+        <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-full shadow-lg">
+          {loading ? (
+            <span className="text-lg font-black text-white">...</span>
+          ) : (
+            <img
+              src={catPreview}
+              alt={view.name ?? '猫咪'}
+              className="h-full w-full object-cover"
+            />
+          )}
         </div>
       </div>
 
