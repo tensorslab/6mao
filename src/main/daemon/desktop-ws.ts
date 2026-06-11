@@ -1,5 +1,11 @@
 import { BrowserWindow } from 'electron'
-import { IPC_CHANNELS, PetProactivePayload, PetEmotionPayload } from '../../shared/ipc-channels'
+import {
+  IPC_CHANNELS,
+  PetAction,
+  PetActionPayload,
+  PetEmotionPayload,
+  PetProactivePayload
+} from '../../shared/ipc-channels'
 
 export interface DesktopWsMessage {
   type: 'action' | 'master_start' | 'master_done' | 'master_artifact' | 'remind' | 'status_update'
@@ -18,6 +24,20 @@ let daemonPort = 8000
 let petId = ''
 
 const RECONNECT_INTERVAL = 5000
+const PET_ACTIONS = new Set<PetAction>([
+  'stand',
+  'walk',
+  'run',
+  'turn',
+  'sit',
+  'lie',
+  'sleep',
+  'stretch',
+  'groom',
+  'jump',
+  'meow',
+  'shadow'
+])
 
 /** Initialize the desktop WebSocket bridge */
 export function initDesktopWs(
@@ -131,10 +151,15 @@ function handleMessage(msg: DesktopWsMessage): void {
   switch (msg.type) {
     case 'action': {
       // Daemon pushes a pet action (e.g. "paw_wave", "idle_nap")
-      const emotion = (msg.name ?? 'idle') as PetEmotionPayload['emotion']
+      const name = msg.name ?? 'idle'
+      const emotion = name as PetEmotionPayload['emotion']
+      const action = name as PetAction
       for (const win of getWindows()) {
         if (!win.isDestroyed()) {
           win.webContents.send(IPC_CHANNELS.PET_EMOTION, { emotion } satisfies PetEmotionPayload)
+          if (PET_ACTIONS.has(action)) {
+            win.webContents.send(IPC_CHANNELS.PET_ACTION, { action } satisfies PetActionPayload)
+          }
         }
       }
       break

@@ -3,12 +3,17 @@ export const IPC_CHANNELS = {
   WINDOW_OPEN_CHAT: 'window:open-chat',
   WINDOW_CLOSE_CHAT: 'window:close-chat',
   WINDOW_SET_IGNORE_MOUSE: 'window:set-ignore-mouse',
+  WINDOW_PET_DRAG_START: 'window:pet-drag-start',
+  WINDOW_PET_DRAG_MOVE: 'window:pet-drag-move',
+  WINDOW_PET_DRAG_END: 'window:pet-drag-end',
+  WINDOW_PET_MOTION_RESUME: 'window:pet-motion-resume',
 
   // ── 宠物数据 ──
   PET_SWITCH: 'pet:switch',
   PET_CURRENT: 'pet:current',
   PET_STATUS_UPDATE: 'pet:status-update',
   PET_EMOTION: 'pet:emotion',
+  PET_ACTION: 'pet:action',
 
   // ── Daemon 管理 ──
   DAEMON_STATUS: 'daemon:status',
@@ -40,10 +45,31 @@ export type PetEmotion =
 
 export type PetRenderMode = 'sprite' | 'live2d'
 
+export type PetAction =
+  | 'stand'
+  | 'walk'
+  | 'run'
+  | 'turn'
+  | 'sit'
+  | 'lie'
+  | 'sleep'
+  | 'stretch'
+  | 'groom'
+  | 'jump'
+  | 'meow'
+  | 'shadow'
+
+export type PetDirection = 'left' | 'right'
+
 export type DaemonStatus = 'starting' | 'running' | 'stopped' | 'error'
 
 export interface OpenChatPayload {
   petId: string
+}
+
+export interface PetDragPayload {
+  screenX: number
+  screenY: number
 }
 
 export interface PetSwitchPayload {
@@ -58,6 +84,11 @@ export interface PetCurrentPayload {
 
 export interface PetEmotionPayload {
   emotion: PetEmotion
+}
+
+export interface PetActionPayload {
+  action: PetAction
+  direction?: PetDirection
 }
 
 export interface DaemonStatusPayload {

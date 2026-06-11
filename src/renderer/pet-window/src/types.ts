@@ -1,10 +1,28 @@
-import type { PetEmotion, PetRenderMode } from '../../../shared/ipc-channels'
+import type {
+  PetAction,
+  PetDirection,
+  PetEmotion,
+  PetRenderMode
+} from '../../../shared/ipc-channels'
 
 /** 六角色 ID — 与 character-style-guide.md 对应 */
 export type CharacterId = 'scholar' | 'tea' | 'mechanic' | 'messenger' | 'student' | 'artist'
 
 /** 向后兼容的 Personality 别名 */
 export type Personality = CharacterId
+
+export interface SpriteActionConfig {
+  fps: number
+  frames: string[]
+  loop: boolean
+  loadFrames?: () => Promise<string[]>
+}
+
+export interface SpriteAssetConfig {
+  previewPath: string
+  defaultAction: PetAction
+  actions: Partial<Record<PetAction, SpriteActionConfig>>
+}
 
 export interface CharacterConfig {
   id: CharacterId
@@ -22,6 +40,8 @@ export interface CharacterConfig {
   modelPath: string
   /** 精灵图路径（备用） */
   spritePath: string
+  /** PNG 序列动画配置 */
+  spriteAsset?: SpriteAssetConfig
   /** 空闲动画名 */
   idleMotion: string
   /** 说话动画名 */
@@ -39,6 +59,9 @@ export interface RenderPet {
 export interface PetRendererProps {
   pet: RenderPet
   emotion: PetEmotion
+  action: PetAction
+  direction: PetDirection
   mode: PetRenderMode
   onClick: () => void
+  onActionComplete?: (action: PetAction) => void
 }

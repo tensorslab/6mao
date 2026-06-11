@@ -8,6 +8,7 @@
 ```bash
 pnpm typecheck ; pnpm lint ; pnpm format #powershell format
 ```
+
 修改代码后，需要执行上述命令
 
 ## 架构概览
