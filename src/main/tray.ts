@@ -25,7 +25,7 @@ export function createAppTray(getPetWindow: () => BrowserWindow | null): Tray {
         }
       },
       {
-        label: '宠物列表',
+        label: '查看喵窝',
         click: () => openChatWindow('list')
       },
       { type: 'separator' },

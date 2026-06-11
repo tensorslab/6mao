@@ -39,7 +39,7 @@ export function adoptPet(payload: AdoptRequest): Promise<Pet> {
         return adoptedPet
       }
 
-      throw new Error('收养请求超时，且刷新宠物列表后没有找到新猫咪。请稍后重试。')
+      throw new Error('收养请求超时，且刷新喵窝后没有找到新猫咪。请稍后重试。')
     })
     .finally(() => {
       window.clearTimeout(timeoutId)
