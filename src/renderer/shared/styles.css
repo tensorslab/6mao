@@ -30,6 +30,26 @@
   --nature:    var(--pine-500);
   --reason:    var(--mist-500);
   --prop:      var(--wood-500);
+
+  /* ── 动态角色主题变量（JS 会动态切换 --accent-current） ── */
+  --accent-current: var(--kaki-500);
+  --accent-current-light: color-mix(in srgb, var(--accent-current) 20%, transparent);
+  --accent-current-medium: color-mix(in srgb, var(--accent-current) 40%, transparent);
+
+  /* ── 圆角 token ── */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  /* ── 阴影 token ── */
+  --shadow-card: 0 2px 12px rgba(79, 62, 48, 0.08);
+  --shadow-float: 0 8px 32px rgba(79, 62, 48, 0.12);
+  --shadow-glow: 0 0 20px var(--accent-current-light);
+
+  /* ── 大师状态相关变量 ── */
+  --master-active-bg: color-mix(in srgb, var(--accent-current) 8%, var(--washi-50));
+  --master-glow: 0 0 24px color-mix(in srgb, var(--accent-current) 30%, transparent);
 }
 
 * {
@@ -69,4 +89,33 @@ textarea {
 .ph-cat {
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* ── 设计系统 Utility 类 ── */
+@layer utilities {
+  .text-fg { color: var(--ink-700); }
+  .text-accent { color: var(--accent-current); }
+  .bg-accent { background-color: var(--accent-current); }
+  .bg-accent-light { background-color: var(--accent-current-light); }
+  .bg-accent-medium { background-color: var(--accent-current-medium); }
+  .border-accent { border-color: var(--accent-current); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-float { box-shadow: var(--shadow-float); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .rounded-token-sm { border-radius: var(--radius-sm); }
+  .rounded-token-md { border-radius: var(--radius-md); }
+  .rounded-token-lg { border-radius: var(--radius-lg); }
+  .rounded-token-xl { border-radius: var(--radius-xl); }
+  .bg-master-active { background-color: var(--master-active-bg); }
+  .shadow-master { box-shadow: var(--master-glow); }
+}
+
+/* ── 大师激活脉冲动画 ── */
+@keyframes master-pulse {
+  0%, 100% { box-shadow: 0 0 8px var(--accent-current-light); }
+  50% { box-shadow: 0 0 24px var(--accent-current-medium); }
+}
+
+.animate-master-pulse {
+  animation: master-pulse 2s ease-in-out infinite;
 }

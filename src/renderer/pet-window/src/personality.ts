@@ -13,7 +13,7 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '算盘、卷宗、深蓝小袄',
     masterSkill: '主理 · 账房（统筹、调度、记账）',
     modelPath: '/models/scholar/scholar.model3.json',
-    spritePath: '/cats/placeholder-cat.svg',
+    spritePath: '/cats/scholar.png',
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 8000
@@ -27,7 +27,7 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '草帽、红绳、陶土小茶壶',
     masterSkill: '茶艺 · 招待（开场、欢迎、安抚）',
     modelPath: '/models/tea/tea.model3.json',
-    spritePath: '/cats/placeholder-cat.svg',
+    spritePath: '/cats/tea.png',
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 7000
@@ -41,7 +41,7 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '蓝围裙、红格方巾、扳手',
     masterSkill: '器物 · 修补（错误恢复、调试）',
     modelPath: '/models/mechanic/mechanic.model3.json',
-    spritePath: '/cats/placeholder-cat.svg',
+    spritePath: '/cats/mechanic.png',
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 9500
@@ -55,7 +55,7 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '粉绸蝴蝶结、托盘、茶杯',
     masterSkill: '跑堂 · 通信（推送、提醒、IM）',
     modelPath: '/models/messenger/messenger.model3.json',
-    spritePath: '/cats/placeholder-cat.svg',
+    spritePath: '/cats/messenger.png',
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 5500
@@ -69,7 +69,7 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '圆框眼镜、卷轴、砚台',
     masterSkill: '查书 · 检索（搜索、读文档）',
     modelPath: '/models/student/student.model3.json',
-    spritePath: '/cats/placeholder-cat.svg',
+    spritePath: '/cats/student.png',
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 7500
@@ -83,7 +83,7 @@ export const CHARACTER_CONFIGS: Record<CharacterId, CharacterConfig> = {
     prop: '樱枝、画笔、调色板',
     masterSkill: '作画 · 创意（图像、文案）',
     modelPath: '/models/artist/artist.model3.json',
-    spritePath: '/cats/placeholder-cat.svg',
+    spritePath: '/cats/artist.png',
     idleMotion: 'idle',
     talkMotion: 'talk',
     idleInterval: 6500

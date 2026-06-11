@@ -41,4 +41,8 @@ export interface PetRendererProps {
   emotion: PetEmotion
   mode: PetRenderMode
   onClick: () => void
+  /** 主动行为提示文案（如提醒、问候）— 存在时在猫咪上方展示气泡 */
+  proactiveText?: string | null
+  /** 大师能力激活态 — 触发猫咪外圈脉冲光环 */
+  masterActive?: boolean
 }

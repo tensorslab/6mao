@@ -4,7 +4,7 @@ import { Cat, List } from 'lucide-react'
 import { WindowTitleBar } from './components/WindowTitleBar'
 import { useOwnerPets } from './hooks/useOwnerPets'
 import { usePetStatus } from './hooks/usePetStatus'
-import { useAppStore } from './store/appStore'
+import { useAppStore, CHARACTER_COLORS } from './store/appStore'
 import { AdoptPage } from './pages/AdoptPage'
 import { ChatPage } from './pages/ChatPage'
 import { PetListPage } from './pages/PetListPage'
@@ -24,8 +24,14 @@ type View = 'chat' | 'list' | 'adopt'
 
 export function App() {
   const queryClient = useQueryClient()
-  const { ownerId, currentPetId, setCurrentPetId } = useAppStore()
+  const { ownerId, currentPetId, setCurrentPetId, currentCharacterId } = useAppStore()
   const [view, setView] = useState<View>('list')
+
+  // 动态角色主题：监听 currentCharacterId 变化，更新 --accent-current CSS 变量
+  useEffect(() => {
+    const color = CHARACTER_COLORS[currentCharacterId] ?? CHARACTER_COLORS.scholar
+    document.documentElement.style.setProperty('--accent-current', color)
+  }, [currentCharacterId])
   const petsQuery = useOwnerPets(ownerId)
   const pets = useMemo(() => petsQuery.data ?? [demoPet], [petsQuery.data])
   const activePet = pets.find((pet) => pet.pet_id === currentPetId) ?? pets[0]
@@ -77,7 +83,9 @@ export function App() {
       <div className="flex items-center gap-2 px-4 py-3">
         <button
           className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-2 text-sm font-black transition ${
-            view === 'chat' ? 'bg-[#2c2118] text-white shadow-lg' : 'bg-white/55 text-[#2c2118]'
+            view === 'chat'
+              ? 'text-white shadow-lg bg-[var(--accent-current)]'
+              : 'bg-white/55 text-[var(--ink-700)]'
           }`}
           onClick={() => setView(activePet ? 'chat' : 'list')}
         >
@@ -86,7 +94,9 @@ export function App() {
         </button>
         <button
           className={`flex flex-1 items-center justify-center gap-2 rounded-2xl px-3 py-2 text-sm font-black transition ${
-            view === 'list' ? 'bg-[#2c2118] text-white shadow-lg' : 'bg-white/55 text-[#2c2118]'
+            view === 'list'
+              ? 'text-white shadow-lg bg-[var(--accent-current)]'
+              : 'bg-white/55 text-[var(--ink-700)]'
           }`}
           onClick={() => setView('list')}
         >

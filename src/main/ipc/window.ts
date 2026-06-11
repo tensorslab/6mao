@@ -10,7 +10,10 @@ import { closeChatWindow, getChatWindow, openChatWindow } from '../windows/chatW
 let registered = false
 let ignoreMouseTimer: NodeJS.Timeout | null = null
 
-export function registerWindowIpc(getPetWindow: () => BrowserWindow | null): void {
+export function registerWindowIpc(
+  getPetWindow: () => BrowserWindow | null,
+  onPetIdChange?: (petId: string) => void
+): void {
   if (registered) return
   registered = true
 
@@ -39,9 +42,13 @@ export function registerWindowIpc(getPetWindow: () => BrowserWindow | null): voi
   })
 
   ipcMain.on(IPC_CHANNELS.PET_CURRENT, (_event, payload: PetCurrentPayload) => {
+    // Forward to pet window so it can update its displayed name/id
     const petWindow = getPetWindow()
-    if (!petWindow || petWindow.isDestroyed()) return
-    petWindow.webContents.send(IPC_CHANNELS.PET_CURRENT, payload)
+    if (petWindow && !petWindow.isDestroyed()) {
+      petWindow.webContents.send(IPC_CHANNELS.PET_CURRENT, payload)
+    }
+    // Notify main process so WebSocket subscription stays in sync
+    onPetIdChange?.(payload.petId)
   })
 
   ipcMain.on(IPC_CHANNELS.PET_STATUS_UPDATE, (_event, payload) => {

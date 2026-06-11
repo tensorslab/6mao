@@ -15,6 +15,18 @@ let restartAttempts = 0
 let healthCheckTimer: NodeJS.Timeout | null = null
 let getAllWindows: (() => BrowserWindow[]) | null = null
 
+type StatusChangeListener = (status: DaemonStatus, port?: number) => void
+const statusListeners: StatusChangeListener[] = []
+
+/** Subscribe to daemon status changes (e.g. to update WebSocket port on restart) */
+export function onDaemonStatusChange(listener: StatusChangeListener): () => void {
+  statusListeners.push(listener)
+  return () => {
+    const idx = statusListeners.indexOf(listener)
+    if (idx !== -1) statusListeners.splice(idx, 1)
+  }
+}
+
 function broadcastStatus(payload: DaemonStatusPayload): void {
   if (!getAllWindows) return
   for (const win of getAllWindows()) {
@@ -26,7 +38,11 @@ function broadcastStatus(payload: DaemonStatusPayload): void {
 
 function setStatus(status: DaemonStatus, port?: number): void {
   daemonStatus = status
-  broadcastStatus({ status, port: port ?? (status === 'running' ? daemonPort : undefined) })
+  const resolvedPort = port ?? (status === 'running' ? daemonPort : undefined)
+  broadcastStatus({ status, port: resolvedPort })
+  for (const listener of statusListeners) {
+    listener(status, resolvedPort)
+  }
 }
 
 /** Scan for an available port starting from DAEMON_START_PORT */

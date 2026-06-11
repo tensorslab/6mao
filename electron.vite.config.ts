@@ -31,6 +31,7 @@ export default defineConfig(({ mode }) => {
     },
     renderer: {
       plugins: [react(), tailwindcss()],
+      publicDir: resolve(__dirname, 'public'),
       server: {
         port: 5173,
         strictPort: true,

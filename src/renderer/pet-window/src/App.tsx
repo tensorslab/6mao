@@ -113,15 +113,13 @@ export function App() {
 
   return (
     <main className="relative flex h-full w-full items-center justify-center bg-transparent">
-      <PetRenderer pet={pet} emotion={emotion} mode={mode} onClick={openChat} />
-
-      {/* Proactive behavior speech bubble */}
-      {proactiveText && (
-        <div className="absolute -top-2 left-1/2 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-[var(--washi-50)]/95 px-3 py-1.5 text-xs text-[var(--ink-700)] shadow-lg backdrop-blur-sm">
-          <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-[var(--washi-50)]/95" />
-          {proactiveText}
-        </div>
-      )}
+      <PetRenderer
+        pet={pet}
+        emotion={emotion}
+        mode={mode}
+        onClick={openChat}
+        proactiveText={proactiveText}
+      />
     </main>
   )
 }
