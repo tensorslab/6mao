@@ -166,10 +166,7 @@ export function getDaemonInfo(): { status: DaemonStatus; port: number } {
   return { status: daemonStatus, port: daemonPort }
 }
 
-function scheduleRestart(
-  getWindows: () => BrowserWindow[],
-  daemonCommand?: string
-): void {
+function scheduleRestart(getWindows: () => BrowserWindow[], daemonCommand?: string): void {
   if (restartAttempts >= MAX_RESTART_ATTEMPTS) {
     console.error('[Daemon] Max restart attempts reached, giving up')
     setStatus('error')
@@ -178,7 +175,9 @@ function scheduleRestart(
 
   restartAttempts++
   const delay = RESTART_BASE_DELAY * Math.pow(2, restartAttempts - 1)
-  console.log(`[Daemon] Restarting in ${delay}ms (attempt ${restartAttempts}/${MAX_RESTART_ATTEMPTS})`)
+  console.log(
+    `[Daemon] Restarting in ${delay}ms (attempt ${restartAttempts}/${MAX_RESTART_ATTEMPTS})`
+  )
 
   setTimeout(() => {
     stopDaemon()
@@ -186,10 +185,7 @@ function scheduleRestart(
   }, delay)
 }
 
-function startHealthCheck(
-  getWindows: () => BrowserWindow[],
-  daemonCommand?: string
-): void {
+function startHealthCheck(getWindows: () => BrowserWindow[], daemonCommand?: string): void {
   if (healthCheckTimer) clearInterval(healthCheckTimer)
   healthCheckTimer = setInterval(async () => {
     const healthy = await checkDaemonHealth()

@@ -1,5 +1,9 @@
 import { ipcMain, BrowserWindow } from 'electron'
-import { IPC_CHANNELS, DaemonStatusPayload, PreferencesUpdatePayload } from '../../shared/ipc-channels'
+import {
+  IPC_CHANNELS,
+  DaemonStatusPayload,
+  PreferencesUpdatePayload
+} from '../../shared/ipc-channels'
 import { getDaemonInfo } from '../daemon/index'
 
 let registered = false

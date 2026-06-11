@@ -47,8 +47,11 @@ VITE_PET_RENDERER=sprite
 ## 常用命令
 
 ```bash
-pnpm typecheck
-pnpm lint
-pnpm build
-pnpm dist
+pnpm dev          # electron-vite 开发服务器（HMR，含全部 3 个进程）
+pnpm backend      # 启动 mock 后端 :8000（Node.js，无需 Python）
+pnpm build        # typecheck + electron-vite 构建
+pnpm typecheck    # tsc --noEmit（renderer + node 两份 tsconfig）
+pnpm lint         # ESLint
+pnpm format       # Prettier
+pnpm dist         # 打包
 ```

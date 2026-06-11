@@ -60,7 +60,10 @@ export function ChatPage({
           </button>
         </div>
 
-        <div ref={scrollRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
+        <div
+          ref={scrollRef}
+          className="min-h-0 flex-1 space-y-3 overflow-x-hidden overflow-y-auto p-4"
+        >
           {messages.length === 0 ? (
             <div className="rounded-3xl bg-[#fff7e8] p-4 text-sm font-semibold text-[#2c2118]/65">
               先说点什么吧。猫咪正在假装没等你。
@@ -70,17 +73,19 @@ export function ChatPage({
           {messages.map((message, index) => (
             <div
               key={`${message.timestamp}-${index}`}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              className={`flex min-w-0 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[82%] rounded-[24px] px-4 py-3 text-sm font-semibold leading-relaxed shadow ${
+                className={`min-w-0 max-w-[82%] whitespace-pre-wrap rounded-[24px] px-4 py-3 text-sm font-semibold leading-relaxed shadow [overflow-wrap:anywhere] ${
                   message.role === 'user'
                     ? 'rounded-br-md bg-[#2c2118] text-white'
                     : 'rounded-bl-md bg-[#fff7e8] text-[#2c2118]'
                 }`}
               >
                 {message.content}
-                {streaming && index === messages.length - 1 ? <span className="animate-pulse"> |</span> : null}
+                {streaming && index === messages.length - 1 ? (
+                  <span className="animate-pulse"> |</span>
+                ) : null}
               </div>
             </div>
           ))}

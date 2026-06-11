@@ -25,16 +25,16 @@
 
 ### 功能需求
 
-| 功能 | 说明 | 接口 |
-|---|---|---|
-| 宠物收养 | 从列表中选择并领养猫咪 | `POST /api/adopt` |
-| 宠物列表 | 展示所有已领养猫咪 | `GET /api/owner/{id}/pets` |
-| 聊天（阻塞） | 普通请求-响应聊天 | `POST /api/pet/{id}/chat` |
-| 聊天（流式） | SSE 流式回复，打字机效果 | `POST /api/pet/{id}/chat/stream` |
-| 宠物状态 | 展示羁绊值、属性、灵魂状态 | `GET /api/pet/{id}/status` |
-| 聊天历史 | 本地持久化，跨会话保留 | 本地 SQLite / localStorage |
-| 桌面浮窗 | 启动后猫咪悬浮在桌面上 | — |
-| 点击唤起 | 点击猫咪弹出聊天面板 | — |
+| 功能         | 说明                       | 接口                             |
+| ------------ | -------------------------- | -------------------------------- |
+| 宠物收养     | 从列表中选择并领养猫咪     | `POST /api/adopt`                |
+| 宠物列表     | 展示所有已领养猫咪         | `GET /api/owner/{id}/pets`       |
+| 聊天（阻塞） | 普通请求-响应聊天          | `POST /api/pet/{id}/chat`        |
+| 聊天（流式） | SSE 流式回复，打字机效果   | `POST /api/pet/{id}/chat/stream` |
+| 宠物状态     | 展示羁绊值、属性、灵魂状态 | `GET /api/pet/{id}/status`       |
+| 聊天历史     | 本地持久化，跨会话保留     | 本地 SQLite / localStorage       |
+| 桌面浮窗     | 启动后猫咪悬浮在桌面上     | —                                |
+| 点击唤起     | 点击猫咪弹出聊天面板       | —                                |
 
 ### 产品交互流程
 
@@ -65,19 +65,19 @@ DeepChat (ThinkInAIXYZ/deepchat) 是基于 Vue + Electron 的通用 AI 客户端
 
 ### 最终技术栈
 
-| 层次 | 技术 | 版本 | 选型理由 |
-|---|---|---|---|
-| 桌面框架 | Electron | 40+ | 透明窗口、常驻桌面、系统托盘原生支持 |
-| 构建工具 | electron-vite | latest | 官方推荐，HMR 极快，主/渲进程统一配置 |
-| UI 框架 | React | 19 | Agent 编程支持最佳，生态最大 |
-| 语言 | TypeScript | 5 | 类型安全，接口类型自动推导 |
-| 样式 | Tailwind CSS | v4 | 无需配置，utility-first |
-| 组件库 | shadcn/ui | latest | 可复制粘贴，不引入 npm 依赖，完全可控 |
-| 数据请求 | TanStack Query | v5 | SSE 原生支持，缓存管理 |
-| 路由 | TanStack Router | v1 | 类型安全路由，适合 SPA |
-| 状态管理 | Zustand | v5 | 极简，无 boilerplate |
-| 动画渲染 | PixiJS + pixi-live2d-display | latest | Live2D 模型渲染 |
-| 本地存储 | electron-store | v10 | 配置持久化 |
+| 层次     | 技术                         | 版本   | 选型理由                              |
+| -------- | ---------------------------- | ------ | ------------------------------------- |
+| 桌面框架 | Electron                     | 40+    | 透明窗口、常驻桌面、系统托盘原生支持  |
+| 构建工具 | electron-vite                | latest | 官方推荐，HMR 极快，主/渲进程统一配置 |
+| UI 框架  | React                        | 19     | Agent 编程支持最佳，生态最大          |
+| 语言     | TypeScript                   | 5      | 类型安全，接口类型自动推导            |
+| 样式     | Tailwind CSS                 | v4     | 无需配置，utility-first               |
+| 组件库   | shadcn/ui                    | latest | 可复制粘贴，不引入 npm 依赖，完全可控 |
+| 数据请求 | TanStack Query               | v5     | SSE 原生支持，缓存管理                |
+| 路由     | TanStack Router              | v1     | 类型安全路由，适合 SPA                |
+| 状态管理 | Zustand                      | v5     | 极简，无 boilerplate                  |
+| 动画渲染 | PixiJS + pixi-live2d-display | latest | Live2D 模型渲染                       |
+| 本地存储 | electron-store               | v10    | 配置持久化                            |
 
 ---
 
@@ -112,13 +112,13 @@ DeepChat (ThinkInAIXYZ/deepchat) 是基于 Vue + Electron 的通用 AI 客户端
 
 ```typescript
 // 窗口控制
-'window:open-chat'        // 猫咪被点击，通知主进程弹出聊天窗口
-'window:close-chat'       // 关闭聊天窗口
+'window:open-chat' // 猫咪被点击，通知主进程弹出聊天窗口
+'window:close-chat' // 关闭聊天窗口
 'window:set-ignore-mouse' // 动态控制鼠标穿透
 
 // 宠物数据（renderer → main → 后端 or 直接 renderer → 后端）
-'pet:switch'              // 切换当前显示的猫咪
-'pet:status-update'       // 状态变化通知
+'pet:switch' // 切换当前显示的猫咪
+'pet:status-update' // 状态变化通知
 ```
 
 > **注意**：HTTP 请求直接在 renderer 发起即可（fetch / EventSource），不必经过 main 进程中转，除非有 CORS 限制。
@@ -134,16 +134,16 @@ DeepChat (ThinkInAIXYZ/deepchat) 是基于 Vue + Electron 的通用 AI 客户端
 const petWindow = new BrowserWindow({
   width: 200,
   height: 200,
-  transparent: true,       // 透明背景
-  frame: false,            // 无边框
+  transparent: true, // 透明背景
+  frame: false, // 无边框
   resizable: false,
   hasShadow: false,
-  skipTaskbar: true,       // 不在任务栏显示
+  skipTaskbar: true, // 不在任务栏显示
   alwaysOnTop: true,
   webPreferences: {
     preload: join(__dirname, '../preload/index.js'),
-    contextIsolation: true,
-  },
+    contextIsolation: true
+  }
 })
 
 petWindow.setAlwaysOnTop(true, 'floating')
@@ -158,10 +158,8 @@ petWindow.setIgnoreMouseEvents(true, { forward: true }) // 初始穿透
 ```typescript
 // src/preload/index.ts
 contextBridge.exposeInMainWorld('electronAPI', {
-  setIgnoreMouse: (ignore: boolean) =>
-    ipcRenderer.send('window:set-ignore-mouse', ignore),
-  openChat: (petId: string) =>
-    ipcRenderer.send('window:open-chat', { petId }),
+  setIgnoreMouse: (ignore: boolean) => ipcRenderer.send('window:set-ignore-mouse', ignore),
+  openChat: (petId: string) => ipcRenderer.send('window:open-chat', { petId })
 })
 
 // src/renderer/pet-window/App.tsx
@@ -178,11 +176,11 @@ useEffect(() => {
 
 **平台差异处理**：
 
-| 平台 | forward 参数 | 备注 |
-|---|---|---|
-| Windows | 支持 | 有拖动时 flicker bug，用 requestAnimationFrame 轮询缓解 |
-| macOS | 不支持 | 改用 `iohook` 或定时轮询鼠标坐标判断 |
-| Linux | 支持 | 基本与 Windows 相同 |
+| 平台    | forward 参数 | 备注                                                    |
+| ------- | ------------ | ------------------------------------------------------- |
+| Windows | 支持         | 有拖动时 flicker bug，用 requestAnimationFrame 轮询缓解 |
+| macOS   | 不支持       | 改用 `iohook` 或定时轮询鼠标坐标判断                    |
+| Linux   | 支持         | 基本与 Windows 相同                                     |
 
 ### 4.3 聊天窗口（chatWindow）
 
@@ -201,13 +199,13 @@ export function openChatWindow(petId: string) {
     width: 400,
     height: 650,
     frame: false,
-    titleBarStyle: 'hidden',  // macOS 原生流量灯
+    titleBarStyle: 'hidden', // macOS 原生流量灯
     vibrancy: 'under-window', // macOS 毛玻璃效果
     backgroundMaterial: 'acrylic', // Windows 11 Mica
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      contextIsolation: true,
-    },
+      contextIsolation: true
+    }
   })
 }
 ```
@@ -220,10 +218,10 @@ const contextMenu = Menu.buildFromTemplate([
   { label: '显示猫咪', click: () => petWindow.show() },
   { label: '宠物列表', click: () => openChatWindow('list') },
   { type: 'separator' },
-  { label: '退出', click: () => app.quit() },
+  { label: '退出', click: () => app.quit() }
 ])
 tray.setContextMenu(contextMenu)
-tray.on('click', () => petWindow.isVisible() ? petWindow.hide() : petWindow.show())
+tray.on('click', () => (petWindow.isVisible() ? petWindow.hide() : petWindow.show()))
 ```
 
 ---
@@ -238,9 +236,9 @@ tray.on('click', () => petWindow.isVisible() ? petWindow.hide() : petWindow.show
 // 每种性格对应一套精灵图
 const PERSONALITY_SPRITES: Record<string, SpriteConfig> = {
   tsundere: { src: '/cats/tsundere.png', frames: 8, fps: 8, idleRow: 0, talkRow: 1 },
-  genki:    { src: '/cats/genki.png',    frames: 8, fps: 12, idleRow: 0, talkRow: 1 },
-  sleepy:   { src: '/cats/sleepy.png',   frames: 6, fps: 5,  idleRow: 0, talkRow: 1 },
-  cool:     { src: '/cats/cool.png',     frames: 8, fps: 8,  idleRow: 0, talkRow: 1 },
+  genki: { src: '/cats/genki.png', frames: 8, fps: 12, idleRow: 0, talkRow: 1 },
+  sleepy: { src: '/cats/sleepy.png', frames: 6, fps: 5, idleRow: 0, talkRow: 1 },
+  cool: { src: '/cats/cool.png', frames: 8, fps: 8, idleRow: 0, talkRow: 1 }
 }
 ```
 
@@ -262,10 +260,10 @@ const model = await Live2DModel.from('/models/tsundere/tsundere.model3.json')
 app.stage.addChild(model)
 
 // 性格对应不同 motion
-model.motion('idle')       // 空闲
-model.motion('talk')       // 说话中
-model.motion('happy')      // 收到喜欢的回复
-model.motion('sad')        // 被冷落
+model.motion('idle') // 空闲
+model.motion('talk') // 说话中
+model.motion('happy') // 收到喜欢的回复
+model.motion('sad') // 被冷落
 ```
 
 **参考项目**：`liwenka1/bongo-cat-next` — 已实现透明窗口 + Live2D 猫咪 + 鼠标交互。
@@ -279,12 +277,12 @@ export type Personality = 'tsundere' | 'genki' | 'sleepy' | 'cool' | 'gentle'
 export interface PetPersonalityConfig {
   id: Personality
   displayName: string
-  modelPath: string          // Live2D 模型路径
-  spritePath: string         // 精灵图路径（备用）
-  idleMotion: string         // 空闲动画
-  talkMotion: string         // 说话动画
-  idleInterval: number       // 随机动作触发间隔 ms
-  color: string              // UI 主题色（聊天窗口）
+  modelPath: string // Live2D 模型路径
+  spritePath: string // 精灵图路径（备用）
+  idleMotion: string // 空闲动画
+  talkMotion: string // 说话动画
+  idleInterval: number // 随机动作触发间隔 ms
+  color: string // UI 主题色（聊天窗口）
 }
 ```
 
@@ -317,7 +315,7 @@ export interface Pet {
 }
 
 export interface PetStatus {
-  bond: number           // 羁绊值 0-100
+  bond: number // 羁绊值 0-100
   stats: {
     hunger: number
     happiness: number
@@ -325,8 +323,8 @@ export interface PetStatus {
     cleanliness: number
   }
   soul: {
-    mood: string         // 当前心情描述
-    trait: string        // 当前突出性格特征
+    mood: string // 当前心情描述
+    trait: string // 当前突出性格特征
   }
 }
 
@@ -338,8 +336,8 @@ export interface ChatMessage {
 
 export interface AdoptRequest {
   ownerId: string
-  petTemplateId: string  // 从列表选择的宠物模板
-  name: string           // 用户给猫咪起的名字
+  petTemplateId: string // 从列表选择的宠物模板
+  name: string // 用户给猫咪起的名字
 }
 ```
 
@@ -351,7 +349,7 @@ export async function* streamChat(petId: string, message: string) {
   const response = await fetch(`/api/pet/${petId}/chat/stream`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({ message })
   })
 
   const reader = response.body!.getReader()
@@ -385,9 +383,9 @@ export async function* streamChat(petId: string, message: string) {
 export function usePetStatus(petId: string) {
   return useQuery({
     queryKey: ['pet-status', petId],
-    queryFn: () => fetch(`/api/pet/${petId}/status`).then(r => r.json()),
-    refetchInterval: 30_000,  // 每 30 秒刷新状态
-    staleTime: 10_000,
+    queryFn: () => fetch(`/api/pet/${petId}/status`).then((r) => r.json()),
+    refetchInterval: 30_000, // 每 30 秒刷新状态
+    staleTime: 10_000
   })
 }
 
@@ -395,7 +393,7 @@ export function usePetStatus(petId: string) {
 export function useOwnerPets(ownerId: string) {
   return useQuery({
     queryKey: ['owner-pets', ownerId],
-    queryFn: () => fetch(`/api/owner/${ownerId}/pets`).then(r => r.json()),
+    queryFn: () => fetch(`/api/owner/${ownerId}/pets`).then((r) => r.json())
   })
 }
 ```
@@ -410,7 +408,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface ChatStore {
-  histories: Record<string, ChatMessage[]>  // petId → messages
+  histories: Record<string, ChatMessage[]> // petId → messages
   addMessage: (petId: string, msg: ChatMessage) => void
   clearHistory: (petId: string) => void
 }
@@ -420,16 +418,16 @@ export const useChatStore = create<ChatStore>()(
     (set) => ({
       histories: {},
       addMessage: (petId, msg) =>
-        set(state => ({
+        set((state) => ({
           histories: {
             ...state.histories,
-            [petId]: [...(state.histories[petId] ?? []), msg],
-          },
+            [petId]: [...(state.histories[petId] ?? []), msg]
+          }
         })),
       clearHistory: (petId) =>
-        set(state => ({
-          histories: { ...state.histories, [petId]: [] },
-        })),
+        set((state) => ({
+          histories: { ...state.histories, [petId]: [] }
+        }))
     }),
     { name: 'cat-chat-history' }
   )
@@ -514,23 +512,26 @@ export const useChatStore = create<ChatStore>()(
 export function useStreamChat(petId: string) {
   const [streaming, setStreaming] = useState(false)
   const [currentReply, setCurrentReply] = useState('')
-  const addMessage = useChatStore(s => s.addMessage)
+  const addMessage = useChatStore((s) => s.addMessage)
 
-  const sendMessage = useCallback(async (content: string) => {
-    addMessage(petId, { role: 'user', content, timestamp: Date.now() })
-    setStreaming(true)
-    setCurrentReply('')
+  const sendMessage = useCallback(
+    async (content: string) => {
+      addMessage(petId, { role: 'user', content, timestamp: Date.now() })
+      setStreaming(true)
+      setCurrentReply('')
 
-    let fullReply = ''
-    for await (const chunk of streamChat(petId, content)) {
-      fullReply += chunk
-      setCurrentReply(fullReply)
-    }
+      let fullReply = ''
+      for await (const chunk of streamChat(petId, content)) {
+        fullReply += chunk
+        setCurrentReply(fullReply)
+      }
 
-    addMessage(petId, { role: 'assistant', content: fullReply, timestamp: Date.now() })
-    setCurrentReply('')
-    setStreaming(false)
-  }, [petId])
+      addMessage(petId, { role: 'assistant', content: fullReply, timestamp: Date.now() })
+      setCurrentReply('')
+      setStreaming(false)
+    },
+    [petId]
+  )
 
   return { sendMessage, streaming, currentReply }
 }
@@ -549,7 +550,7 @@ export function useStreamChat(petId: string) {
 
 ```typescript
 // 在 chatWindow 接收到 SSE 完成后，通知 petWindow 切换动画
-window.electronAPI.notifyPetEmotion('happy')  // 或 'sad', 'surprised'
+window.electronAPI.notifyPetEmotion('happy') // 或 'sad', 'surprised'
 ```
 
 ---
@@ -595,7 +596,7 @@ window.electronAPI.notifyPetEmotion('happy')  // 或 'sad', 'surprised'
 基于以下接口定义，生成 ChatPage.tsx 组件：
 - 接口类型：见 src/renderer/api/types.ts
 - 使用 useStreamChat hook（已存在）
-- 使用 useChatStore 获取历史（已存在）  
+- 使用 useChatStore 获取历史（已存在）
 - 使用 shadcn/ui 的 ScrollArea、Input、Button 组件
 - 聊天气泡：用户消息右对齐，猫咪消息左对齐
 - 流式回复时显示光标动画
@@ -643,11 +644,11 @@ window.electronAPI.notifyPetEmotion('happy')  // 或 'sad', 'surprised'
 
 ## 参考资源
 
-| 资源 | 用途 |
-|---|---|
-| [liwenka1/bongo-cat-next](https://github.com/liwenka1/bongo-cat-next) | Live2D 猫咪 + 透明窗口参考 |
-| [WanNianYanHuo/-Live2d-](https://github.com/WanNianYanHuo/-Live2d-) | Electron + PixiJS + Live2D 桌宠参考 |
-| [daltonmenezes/electron-app](https://github.com/daltonmenezes/electron-app) | React 19 + Tailwind 4 + shadcn Electron boilerplate |
-| [pixi-live2d-display](https://github.com/guansss/pixi-live2d-display) | Live2D + PixiJS 渲染库 |
-| [Electron 透明窗口文档](https://www.electronjs.org/docs/latest/tutorial/custom-window-styles) | 透明窗口官方文档 |
-| [Electron setIgnoreMouseEvents](https://www.electronjs.org/docs/latest/tutorial/custom-window-interactions) | 鼠标穿透官方文档 |
+| 资源                                                                                                        | 用途                                                |
+| ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| [liwenka1/bongo-cat-next](https://github.com/liwenka1/bongo-cat-next)                                       | Live2D 猫咪 + 透明窗口参考                          |
+| [WanNianYanHuo/-Live2d-](https://github.com/WanNianYanHuo/-Live2d-)                                         | Electron + PixiJS + Live2D 桌宠参考                 |
+| [daltonmenezes/electron-app](https://github.com/daltonmenezes/electron-app)                                 | React 19 + Tailwind 4 + shadcn Electron boilerplate |
+| [pixi-live2d-display](https://github.com/guansss/pixi-live2d-display)                                       | Live2D + PixiJS 渲染库                              |
+| [Electron 透明窗口文档](https://www.electronjs.org/docs/latest/tutorial/custom-window-styles)               | 透明窗口官方文档                                    |
+| [Electron setIgnoreMouseEvents](https://www.electronjs.org/docs/latest/tutorial/custom-window-interactions) | 鼠标穿透官方文档                                    |

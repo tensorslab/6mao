@@ -33,13 +33,7 @@ function toPercent(value: unknown): number {
   return Math.max(0, Math.min(100, Math.round(numericValue * 100)))
 }
 
-export function StatusPanel({
-  status,
-  loading
-}: {
-  status?: PetStatus
-  loading: boolean
-}) {
+export function StatusPanel({ status, loading }: { status?: PetStatus; loading: boolean }) {
   const view = status ?? fallbackStatus
   const stats = view.stats ?? fallbackStatus.stats
   const bondPercent = toPercent(view.bond?.score)
@@ -68,13 +62,15 @@ export function StatusPanel({
                 <span>{percent}%</span>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
-                <div className="h-full rounded-full bg-[#f07f61]" style={{ width: `${percent}%` }} />
+                <div
+                  className="h-full rounded-full bg-[#f07f61]"
+                  style={{ width: `${percent}%` }}
+                />
               </div>
             </div>
           )
         })}
       </div>
-
     </section>
   )
 }

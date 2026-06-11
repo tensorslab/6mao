@@ -34,7 +34,7 @@ export default [
         MouseEvent: 'readonly',
         HTMLElement: 'readonly',
         AbortController: 'readonly',
-        TextDecoder: 'readonly',
+        TextDecoder: 'readonly'
       }
     },
     plugins: {

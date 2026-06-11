@@ -12,9 +12,5 @@
       "@pet/*": ["src/renderer/pet-window/src/*"]
     }
   },
-  "include": [
-    "src/renderer/**/*",
-    "src/shared/**/*",
-    "src/preload/renderer.d.ts"
-  ]
+  "include": ["src/renderer/**/*", "src/shared/**/*", "src/preload/renderer.d.ts"]
 }

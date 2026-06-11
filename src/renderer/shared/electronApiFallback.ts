@@ -21,6 +21,7 @@ export function installElectronApiFallback(): void {
     },
     onPetSwitch: () => noopUnsubscribe,
     onCurrentPet: () => noopUnsubscribe,
-    onPetEmotion: () => noopUnsubscribe
+    onPetEmotion: () => noopUnsubscribe,
+    onPetProactive: () => noopUnsubscribe
   } satisfies ElectronAPI
 }

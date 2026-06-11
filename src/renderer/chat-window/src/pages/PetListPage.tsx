@@ -41,7 +41,7 @@ export function PetListPage({
             onClick={() => onSelect(pet.pet_id)}
           >
             <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#f4b860] text-white">
-            <Cat />
+              <Cat />
             </div>
             <div className="min-w-0">
               <h3 className="truncate font-black text-[#2c2118]">{pet.name}</h3>

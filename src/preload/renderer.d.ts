@@ -1,4 +1,4 @@
-import type { PetEmotion } from '../shared/ipc-channels'
+import type { PetEmotion, PetProactivePayload } from '../shared/ipc-channels'
 
 export interface ElectronAPI {
   openChat: (petId: string) => void
@@ -9,6 +9,7 @@ export interface ElectronAPI {
   onPetSwitch: (callback: (petId: string) => void) => () => void
   onCurrentPet: (callback: (pet: { petId: string; name: string }) => void) => () => void
   onPetEmotion: (callback: (emotion: PetEmotion) => void) => () => void
+  onPetProactive: (callback: (payload: PetProactivePayload) => void) => () => void
 }
 
 declare global {

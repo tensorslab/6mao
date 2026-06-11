@@ -5,6 +5,7 @@ import {
   PetCurrentPayload,
   PetEmotion,
   PetEmotionPayload,
+  PetProactivePayload,
   PetSwitchPayload
 } from '../shared/ipc-channels'
 
@@ -38,6 +39,13 @@ const electronAPI = {
     }
     ipcRenderer.on(IPC_CHANNELS.PET_EMOTION, listener)
     return () => ipcRenderer.removeListener(IPC_CHANNELS.PET_EMOTION, listener)
+  },
+  onPetProactive: (callback: (payload: PetProactivePayload) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, payload: PetProactivePayload) => {
+      callback(payload)
+    }
+    ipcRenderer.on(IPC_CHANNELS.PET_PROACTIVE, listener)
+    return () => ipcRenderer.removeListener(IPC_CHANNELS.PET_PROACTIVE, listener)
   }
 }
 

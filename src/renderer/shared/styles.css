@@ -1,35 +1,41 @@
 @import 'tailwindcss';
 
 :root {
-  color: #4F3E30;
+  color: #4f3e30;
   background: transparent;
   font-family:
-    'Nunito', 'Baloo 2', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    'Nunito',
+    'Baloo 2',
+    'Segoe UI',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 
   /* ── 半山喵事处 · Character Style Guide 色板 ── */
-  --washi-50:  #FCF6E7;   /* 底纸 */
-  --washi-100: #F8EED4;   /* 纸面阴影 */
-  --kaki-500:  #D67A3E;   /* 柿橙（主点缀色） */
-  --kaki-700:  #8B431A;   /* 柿橙深（强调） */
-  --sakura-500: #E8A4A4;  /* 樱粉（情感） */
-  --pine-500:  #7A8B6B;   /* 松绿（自然/安定） */
-  --mist-500:  #A8B8C5;   /* 霧蓝（理性/检索） */
-  --ink-700:   #4F3E30;   /* 墨褐（线稿/文字） */
-  --wood-500:  #8B6F47;   /* 原木（道具） */
+  --washi-50: #fcf6e7; /* 底纸 */
+  --washi-100: #f8eed4; /* 纸面阴影 */
+  --kaki-500: #d67a3e; /* 柿橙（主点缀色） */
+  --kaki-700: #8b431a; /* 柿橙深（强调） */
+  --sakura-500: #e8a4a4; /* 樱粉（情感） */
+  --pine-500: #7a8b6b; /* 松绿（自然/安定） */
+  --mist-500: #a8b8c5; /* 霧蓝（理性/检索） */
+  --ink-700: #4f3e30; /* 墨褐（线稿/文字） */
+  --wood-500: #8b6f47; /* 原木（道具） */
 
   /* ── 语义化别名 ── */
-  --bg:        var(--washi-50);
+  --bg: var(--washi-50);
   --bg-shadow: var(--washi-100);
-  --fg:        var(--ink-700);
-  --accent:    var(--kaki-500);
+  --fg: var(--ink-700);
+  --accent: var(--kaki-500);
   --accent-deep: var(--kaki-700);
-  --emotion:   var(--sakura-500);
-  --nature:    var(--pine-500);
-  --reason:    var(--mist-500);
-  --prop:      var(--wood-500);
+  --emotion: var(--sakura-500);
+  --nature: var(--pine-500);
+  --reason: var(--mist-500);
+  --prop: var(--wood-500);
 }
 
 * {
