@@ -5,7 +5,7 @@ import { openChatWindow } from './windows/chatWindow'
 let tray: Tray | null = null
 
 function getTrayIcon(): Electron.NativeImage {
-  const icon = nativeImage.createFromPath(join(__dirname, '../../resources/tray-icon.svg'))
+  const icon = nativeImage.createFromPath(join(__dirname, '../../resources/icon.png'))
   return icon.isEmpty() ? nativeImage.createEmpty() : icon.resize({ width: 18, height: 18 })
 }
 
