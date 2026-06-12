@@ -47,14 +47,7 @@ function CatAnimation({ action, frames, fps, loop, alt, onComplete }: CatAnimati
   )
 }
 
-export function CatSprite({
-  pet,
-  emotion,
-  action,
-  direction,
-  onClick,
-  onActionComplete
-}: PetRendererProps) {
+export function CatSprite({ pet, emotion, action, onClick, onActionComplete }: PetRendererProps) {
   const config = PERSONALITY_CONFIGS[pet.personality]
   const dragStateRef = useRef<{
     pointerId: number
@@ -163,10 +156,7 @@ export function CatSprite({
               : ''
         }`}
       >
-        <div
-          className="h-full w-full"
-          style={{ transform: direction === 'left' ? 'scaleX(-1)' : undefined }}
-        >
+        <div className="h-full w-full">
           <CatAnimation
             key={action}
             action={action}
