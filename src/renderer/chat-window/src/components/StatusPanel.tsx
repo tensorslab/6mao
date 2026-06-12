@@ -86,7 +86,7 @@ export function StatusPanel({
         </div>
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-4 grid grid-cols-3 gap-2">
         {visibleStatKeys.map((key) => {
           const percent = toPercent(stats[key])
 
