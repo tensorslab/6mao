@@ -33,6 +33,7 @@ export async function* streamChat(
   const decoder = new TextDecoder()
   let buffer = ''
   let currentEvent = 'message'
+  let hasYieldedText = false
 
   while (true) {
     const { done, value } = await reader.read()
@@ -69,7 +70,16 @@ export async function* streamChat(
           throw new Error(parsed.message ?? parsed.error ?? 'Stream error')
         }
 
-        if (currentEvent === 'done') return
+        if (currentEvent === 'done') {
+          // Reasoning models (Gemma4-vllm etc.) may embed the actual response
+          // inside reasoning_content. In that case zero llm_text events are
+          // emitted during streaming and the only place the text appears is
+          // the `response` field on the `done` event.  Yield it ONLY when no
+          // llm_text was ever received to avoid duplicating normal streaming.
+          const finalText = parsed.response ?? ''
+          if (finalText && !hasYieldedText) yield finalText
+          return
+        }
 
         if (
           currentEvent === 'llm_text' ||
@@ -77,7 +87,9 @@ export async function* streamChat(
           currentEvent === 'worker_stream' ||
           currentEvent === 'artifact'
         ) {
-          yield parsed.chunk ?? parsed.text ?? parsed.content ?? parsed.response ?? ''
+          const text = parsed.chunk ?? parsed.text ?? parsed.content ?? parsed.response ?? ''
+          if (text) hasYieldedText = true
+          yield text
         }
       } catch {
         if (currentEvent === 'error') {

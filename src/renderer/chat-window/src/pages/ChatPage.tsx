@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useRef, useState } from 'react'
-import { Send, Trash2 } from 'lucide-react'
+import { Send, Square, Trash2 } from 'lucide-react'
 import type { ChatMessage, PetStatus } from '../api/types'
 import { useChatStore } from '../store/chatHistory'
 import { useStreamChat } from '../hooks/useStreamChat'
@@ -24,7 +24,7 @@ export function ChatPage({
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const history = useChatStore((state) => state.histories[petId] ?? EMPTY_MESSAGES)
   const clearHistory = useChatStore((state) => state.clearHistory)
-  const { sendMessage, streaming, currentReply, error } = useStreamChat(ownerId, petId)
+  const { sendMessage, stop, streaming, currentReply, error } = useStreamChat(ownerId, petId)
 
   const messages: ChatMessage[] = currentReply
     ? [...history, { role: 'assistant', content: currentReply, timestamp: 0 }]
@@ -115,13 +115,24 @@ export function ChatPage({
             }}
             placeholder="输入消息，Enter 发送"
           />
-          <button
-            className="no-drag grid h-11 w-11 place-items-center rounded-2xl bg-[#f07f61] text-white shadow-lg transition hover:scale-105 disabled:opacity-50"
-            disabled={streaming || !input.trim()}
-            aria-label="发送"
-          >
-            <Send size={18} />
-          </button>
+          {streaming ? (
+            <button
+              className="no-drag grid h-11 w-11 place-items-center rounded-2xl bg-[#f07f61] text-white shadow-lg transition hover:scale-105"
+              onClick={stop}
+              aria-label="停止生成"
+            >
+              <Square size={16} fill="currentColor" />
+            </button>
+          ) : (
+            <button
+              className="no-drag grid h-11 w-11 place-items-center rounded-2xl bg-[#f07f61] text-white shadow-lg transition hover:scale-105 disabled:opacity-50"
+              disabled={!input.trim()}
+              type="submit"
+              aria-label="发送"
+            >
+              <Send size={18} />
+            </button>
+          )}
         </form>
       </div>
     </section>
