@@ -13,14 +13,14 @@ import type { Pet } from './api/types'
 import { releasePet } from './api/pets'
 import { useChatStore } from './store/chatHistory'
 
-const demoPet: Pet = {
+const makeDemoPet = (ownerId: string): Pet => ({
   pet_id: 'demo-cat',
   name: '六毛',
   personality: 'genki',
   created_at: new Date().toISOString(),
-  owner_id: 'local-owner',
+  owner_id: ownerId,
   bond_stage: 'Preview'
-}
+})
 
 type View = 'chat' | 'list' | 'adopt'
 
@@ -32,7 +32,7 @@ export function App() {
   const [adoptedPet, setAdoptedPet] = useState<Pet | null>(null)
 
   const petsQuery = useOwnerPets(ownerId)
-  const pets = useMemo(() => petsQuery.data ?? [demoPet], [petsQuery.data])
+  const pets = useMemo(() => petsQuery.data ?? [makeDemoPet(ownerId)], [petsQuery.data, ownerId])
   const activePet = pets.find((pet) => pet.pet_id === currentPetId) ?? pets[0]
   const statusQuery = usePetStatus(activePet?.pet_id ?? 'list')
 
@@ -172,9 +172,7 @@ export function App() {
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
-        {view === 'adopt' ? (
-          <AdoptPage ownerId={ownerId} onAdopted={handleAdopted} />
-        ) : null}
+        {view === 'adopt' ? <AdoptPage ownerId={ownerId} onAdopted={handleAdopted} /> : null}
 
         {view === 'list' ? (
           <PetListPage

@@ -71,7 +71,7 @@ export function AdoptPage({
 
   const { data: existingPets } = useOwnerPets(ownerId)
   const isMaxPets = useMemo(() => (existingPets?.length ?? 0) >= 3, [existingPets])
-  
+
   const isDuplicateName = useMemo(() => {
     const trimmed = name.trim()
     if (!trimmed || !existingPets) return false
@@ -79,8 +79,7 @@ export function AdoptPage({
   }, [name, existingPets])
 
   const mutation = useMutation({
-    mutationFn: () =>
-      adoptPet({ owner_id: ownerId, species: 'cat', template: templateId!, name }),
+    mutationFn: () => adoptPet({ owner_id: ownerId, species: 'cat', template: templateId!, name }),
     onSuccess: (pet) => {
       queryClient.invalidateQueries({ queryKey: ['owner-pets', ownerId] })
       onAdopted(pet)
@@ -160,13 +159,18 @@ export function AdoptPage({
 
       {mutation.error ? (
         <div className="rounded-2xl bg-[#f07f61]/15 p-4 text-sm font-bold text-[#9d2f1c]">
-          {mutation.error instanceof Error && mutation.error.message.includes('max pets reached') ? (
+          {mutation.error instanceof Error &&
+          mutation.error.message.includes('max pets reached') ? (
             <div className="space-y-2">
               <p>😿 抱歉，你的喵窝已经挤满啦（上限 3 只）。</p>
-              <p className="text-xs opacity-70">如果你想领养新的猫咪，请先在喵窝中释放一只猫咪。每一个离别都是为了更好的相遇。</p>
+              <p className="text-xs opacity-70">
+                如果你想领养新的猫咪，请先在喵窝中释放一只猫咪。每一个离别都是为了更好的相遇。
+              </p>
             </div>
+          ) : mutation.error instanceof Error ? (
+            mutation.error.message
           ) : (
-            mutation.error instanceof Error ? mutation.error.message : '收养失败'
+            '收养失败'
           )}
         </div>
       ) : null}

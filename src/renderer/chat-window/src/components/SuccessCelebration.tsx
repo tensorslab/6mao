@@ -73,7 +73,7 @@ export function SuccessCelebration({ pet, totalCount, onStartChat }: SuccessCele
         <div className="relative flex flex-col items-center">
           <div className="absolute inset-0 -z-10 animate-ping rounded-full bg-[#f4b860]/20" />
           <div className="absolute inset-0 -z-10 h-64 w-64 animate-pulse rounded-full bg-[#f07f61]/10 blur-3xl" />
-          
+
           <div className="relative mb-6 transform transition-all duration-1000 ease-out scale-110">
             {/* 猫咪剪影渐变为清晰图标 */}
             <div className="relative">
@@ -86,7 +86,7 @@ export function SuccessCelebration({ pet, totalCount, onStartChat }: SuccessCele
                 </div>
               </div>
             </div>
-            
+
             {/* 粒子效果模拟 */}
             <div className="absolute -inset-8 pointer-events-none">
               {[...Array(8)].map((_, i) => (
@@ -96,7 +96,7 @@ export function SuccessCelebration({ pet, totalCount, onStartChat }: SuccessCele
                   style={{
                     left: '50%',
                     top: '50%',
-                    transform: `rotate(${i * 45}deg) translateY(-80px)`,
+                    transform: `rotate(${i * 45}deg) translateY(-80px)`
                   }}
                 >
                   ❤️
@@ -104,7 +104,7 @@ export function SuccessCelebration({ pet, totalCount, onStartChat }: SuccessCele
               ))}
             </div>
           </div>
-          
+
           <h2 className="animate-in slide-in-from-bottom-4 fade-in text-3xl font-black text-[#2c2118] duration-700 delay-1000">
             领养成功！
           </h2>
@@ -138,7 +138,9 @@ export function SuccessCelebration({ pet, totalCount, onStartChat }: SuccessCele
 
             {/* 卡片底部 */}
             <div className="border-t border-[#2c2118]/5 pt-8 text-center">
-              <p className="mb-1 text-xs font-bold text-[#2c2118]/40">领养日期：{new Date().toLocaleDateString()}</p>
+              <p className="mb-1 text-xs font-bold text-[#2c2118]/40">
+                领养日期：{new Date().toLocaleDateString()}
+              </p>
               <p className="text-sm font-black text-[#f07f61]">
                 {getOrdinalText(totalCount)}，{getEmotionalQuote(totalCount)}
               </p>
