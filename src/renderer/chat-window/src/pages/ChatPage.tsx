@@ -4,6 +4,7 @@ import type { ChatMessage, PetStatus } from '../api/types'
 import { useChatStore } from '../store/chatHistory'
 import { useStreamChat } from '../hooks/useStreamChat'
 import { StatusPanel } from '../components/StatusPanel'
+import { MessageContent } from '../components/MessageContent'
 
 const EMPTY_MESSAGES: ChatMessage[] = []
 
@@ -84,7 +85,7 @@ export function ChatPage({
                     : 'rounded-bl-md bg-[#fff7e8] text-[#2c2118]'
                 }`}
               >
-                {message.content}
+                <MessageContent content={message.content} />
                 {streaming && index === messages.length - 1 ? (
                   <span className="animate-pulse"> |</span>
                 ) : null}
